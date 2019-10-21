@@ -22,7 +22,7 @@ services:
     restart: always
     environment:
       POSTGRES_PASSWORD: pass
-      POSTGRES_USER: user
+      POSTGRES_USER: myuser
       POSTGRES_DB: db
     volumes:
       - ~/Projects/GiantTrader/docker/gian_trade_db/data:/var/lib/postgresql/data

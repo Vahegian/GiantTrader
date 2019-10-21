@@ -5,6 +5,9 @@ class BinanceCom:
     def __init__(self):
         self.default_Key="api_key"
         self.default_Secret="api_secret"
+        self.second_limit = 10
+        self.minute_limit = 1200
+        self.day_limit = 100000
 
     def connect_to_account(self, apiKey, apiSecret):
         if apiKey==apiSecret==None:
