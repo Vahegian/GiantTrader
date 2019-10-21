@@ -1,0 +1,36 @@
+version: '3.5'
+services:
+  py:
+    image: giantradepy
+    restart: always
+    volumes:
+      - ~/Projects/GiantTrader/python/GianTrade_Engine/app:/usr/src/app
+    networks:
+      - backend
+    ports:
+      - 10001:5000
+#   remove after development
+    command: /bin/sh
+    stdin_open: true
+    tty: true
+#   \remove after developmet
+    depends_on:
+      - db
+  
+  db:
+    image: postgres:12.0
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: user
+      POSTGRES_DB: db
+    volumes:
+      - ~/Projects/GiantTrader/docker/gian_trade_db/data:/var/lib/postgresql/data
+    networks:
+      - backend
+    ports:
+      - 10000:5432
+
+networks:
+  backend:
+    name: gian_trade_net
