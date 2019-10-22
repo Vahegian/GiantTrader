@@ -32,28 +32,27 @@ class Connector:
 
     def select_from(self, tnames, cols, conds=None, order_col=None, dec=False, limit=None):
         options = [f"SELECT {cols}", f"FROM {tnames}", f"WHERE {conds}", f"ORDER BY {order_col}", "DESC", f"LIMIT {limit}"]
+        opList = []
         qString = ""
-        if tnames != None:
-            qString+=options[0]
-            if cols != None:
-                qString+=" "+options[1]
-                if conds != None:
-                    qString+=" "+options[2]
-                    if order_col != None:
-                        qString+=" "+options[3]
-                        if dec:
-                            qString+= " "+options[4]
-                            if limit != None:
-                                qString+=" "+options[5]+";"
-                            else:
-                                qString+=";"
-                        else:
-                            qString+=";"
-                    else:
-                        qString+=";"
-                else:
-                    qString+=";"
+        if tnames==None or cols==None:
+            return
+        else:
+            qString+=options[0]+" "+options[1]
+        
+        if conds != None:
+            opList.append(2)
+        if order_col != None:
+            opList.append(3)
+        if dec:
+            opList.append(4)
+        if limit != None:
+            opList.append(5)
 
+        for index in opList:
+            qString+=" "+options[index]
+        qString+=";"
+        print(qString)
+        
         self._cur.execute(qString)
         return self._cur.fetchall()
 
@@ -77,7 +76,7 @@ if __name__ == "__main__":
                                 secret CHAR(128)''')
     c.insert_into_table("users", "id, name, enc_pass", '''(1, 'vahe', '9234708uj')''')
     c.insert_into_table("users", "id, name, enc_pass", '''(2, 'avahe', '9234708uj')''')
-    print(c.select_from("users", "*", "enc_pass>'92'", "name", dec=False, limit=1))
+    print(c.select_from("users", "*", "enc_pass>'92'", "name", dec=True, limit=1))
     c.disconnect()
     # c.create_db("gian")
     # print(c.list_dbs())
