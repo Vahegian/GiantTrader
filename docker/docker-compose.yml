@@ -1,7 +1,7 @@
 version: '3.5'
 services:
   py:
-    image: giantradepy
+    build: ~/Projects/GiantTrader/docker/gian_trade_engine/
     restart: always
     volumes:
       - ~/Projects/GiantTrader/python/GianTrade_Engine/app:/usr/src/app
