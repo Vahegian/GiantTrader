@@ -108,7 +108,7 @@ if __name__ == "__main__":
     c.insert_into_table("users", "id, name, enc_pass", '''(1, 'vahe', '9234708uj')''')
     c.insert_into_table("users", "id, name, enc_pass", '''(2, 'avahe', '9234708uj')''')
     print(c.select_from("users", "*", "enc_pass>'92'", "name", dec=True, limit=1))
-    c.update_table("users", "name='gang'", "id='1'")
+    c.update_table("users", "name='ang'", "id='1'")
     print(c.select_from("users", "*"))
     c.delete_from("users", "id='2'")
     print(c.select_from("users", "*"))

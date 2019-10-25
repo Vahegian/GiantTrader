@@ -1,11 +1,13 @@
 from binance.client import Client
 from binance.websockets import BinanceSocketManager
 import time
+from datetime import date, timedelta
 
 class BinanceCom:
     def __init__(self):
         self.default_Key="api_key"
         self.default_Secret="api_secret"
+        self._client = None
         self.second_limit = 10
         self.minute_limit = 1200
         self.day_limit = 200000
@@ -13,6 +15,7 @@ class BinanceCom:
         self._sec_req_count = 0
         self._min_req_count = 0
         self._day_req_count = 0
+        self.min_amount_allowed_USD=10.0
 
     def _allow_execut(self, count, limit, now, secs, whatlimit=""):
         execute = False
@@ -41,13 +44,22 @@ class BinanceCom:
                 raise Exception("Exchange request limit reached!")
         return inner
 
+    def check_client(func):
+        def inner(self, *args, **kwargs):
+            if self._client!=None:
+                return func(self, *args, **kwargs)
+            else:
+                print("Operation is not complete, connect to client")
+        return inner
+
     def set_last_req_time(self, timeinseconds):
         timeinseconds = int(timeinseconds)
         self._last_req_time=timeinseconds
 
-    @watch_limit    
-    def update_request_limits(self, client):
-        rates = client.get_exchange_info()['rateLimits']
+    @watch_limit 
+    @check_client   
+    def update_request_limits(self):
+        rates = self._client.get_exchange_info()['rateLimits']
         for item in rates:
             if item['interval']=='SECOND':
                 self.second_limit=int(item['limit'])
@@ -60,51 +72,112 @@ class BinanceCom:
     def connect_to_account(self, apiKey, apiSecret):
         if apiKey==apiSecret==None:
             raise ValueError("Received 'None' argument.")
-        return Client(apiKey, apiSecret)
+        self._client = Client(apiKey, apiSecret)
+        return True
     
     @watch_limit
-    def get_coin_info(self, client, pair):
-        return client.get_ticker(symbol=pair)
+    @check_client
+    def get_coin_info(self, pair):
+        return self._client.get_ticker(symbol=pair)
     
     @watch_limit
-    def get_server_time(self, client):
-        return client.get_server_time()
+    @check_client
+    def get_server_time(self):
+        return self._client.get_server_time()
     
     def get_default_pairs(self):
         return ['BTCUSDT', 'ETHUSDT', 'XRPUSDT']
 
     @watch_limit
-    def get_wallet(self, client):
-        content = client.get_account()['balances']
+    @check_client
+    def get_wallet(self):
+        content = self._client.get_account()['balances']
         available_balances = {}
         for item in content:
             if float(item['free'])+float(item['locked'])> 0.0:
-                available_balances.update({item['asset']:[{'free':item['free']}, {'locked':item['locked']}]})
+                data = {}
+                data.update({'free':item['free']})
+                data.update({'locked':item['locked']})
+                available_balances.update({item['asset']:data})
         return available_balances
     
     @watch_limit
-    def get_open_orders(self, client):
-        content = client.get_open_orders()
+    @check_client
+    def get_open_orders(self):
+        content = self._client.get_open_orders()
         features_to_include = ['orderId', 'price', 'origQty', 'executedQty', 'type', 'side', 'stopPrice']
         orders = {}
         for item in content:
-            data = []
+            data = {}
             for feature in features_to_include:
-                data.append({feature:item[feature]})
+                data.update({feature:item[feature]})
             orders.update({item['symbol']:data})
         return orders
+
+    @watch_limit
+    @check_client
+    def cancel_order(self, symbol, orderId):
+        if int(orderId) != None and symbol !=None:
+            return self._client.cancel_order(symbol=symbol, orderId=orderId)
     
-    
-    
-    
+    @watch_limit
+    @check_client
+    def put_limit_order_buy(self, symbol, quantity, price):
+        if symbol!=None and float(quantity) != None and float(price) != None:
+            if quantity*price>self.min_amount_allowed_USD:
+                return self._client.order_limit_buy(symbol=symbol, quantity=quantity, price=price)   
+
+    @watch_limit
+    @check_client
+    def put_limit_order_sell(self, symbol, quantity, price):
+        if symbol!=None and float(quantity) != None and float(price) != None:
+            if quantity*price>self.min_amount_allowed_USD:
+                return self._client.order_limit_sell(symbol=symbol, quantity=quantity, price=price) 
+
+    @watch_limit
+    @check_client
+    def get_live_ticker_update(self, callback):
+        bm = BinanceSocketManager(self._client)
+        bm.start_ticker_socket(callback=callback)
+        bm.start()
+
+    @watch_limit
+    @check_client
+    def get_hist_data_day_interval(self, symbol, numofdays):
+        d = date.today() - timedelta(days=int(numofdays))
+        content = self._client.get_historical_klines(symbol ,self._client.KLINE_INTERVAL_1DAY, str(d)+" UTC", limit=1000)
+        data = {}
+        for item in content:
+            item_date = str(date.fromtimestamp(int(item[0]/1000)))
+            item_content = {"open":item[1],
+                            "high":item[2],
+                            "low":item[3],
+                            "close":item[4],
+                            "volume":item[5]}
+            data.update({item_date: item_content})
+        return data
+
 if __name__ == "__main__":
     bc = BinanceCom()
     # Create client which will send requests to exchange, default values will not enable trading.
-    client = bc.connect_to_account(bc.default_Key, bc.default_Secret)
+    isConected = bc.connect_to_account(bc.default_Key, bc.default_Secret)
     # Get exchange request limits, values will be members of the class.
-    bc.update_request_limits(client)
+    bc.update_request_limits()
     # Get wallet content only assets with value will be presented.
-    print("\n",bc.get_wallet(client))
+    print("\n",bc.get_wallet())
     # Get open orders
-    print("\n", bc.get_open_orders(client))
+    oOrder = bc.get_open_orders()
+    print("\n", oOrder)
+    # Cancel an active order
+    # print("\n", bc.cancel_order('XRPUSDC', oOrder['XRPUSDC']['orderId']))
+
+    #put sell limit order
+    # print(bc.put_limit_order_sell("XRPUSDT", 31.6, 0.48))
+    
+    # # get live update from web socket
+    # p = lambda msg: print(msg[0]['s'], msg[0]['p'])
+    # bc.get_live_ticker_update(p)
+
+    #get historical OHLCV data
+    print("\n", bc.get_hist_data_day_interval("XRPUSDT", 3))
     
