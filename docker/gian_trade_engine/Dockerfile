@@ -11,6 +11,8 @@ RUN mkdir ${ENTRY_PATH}
 WORKDIR ${ENTRY_PATH}
 # \Working directory
 
+EXPOSE 5000/tcp
+
 # Software b1
 RUN apt-get update && \
     apt-get install -y tzdata && \
@@ -18,7 +20,8 @@ RUN apt-get update && \
     apt-get install -y python${PYTHON_VERSION}-pip && \
     apt-get install -y python${PYTHON_VERSION}-opencv && \
     apt-get install -y iputils-ping && \
-    apt-get install -y libpq-dev
+    apt-get install -y libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
 # \Software b1
 
 # Python libs b1
@@ -26,12 +29,12 @@ RUN pip${PYTHON_VERSION} install python-binance && \
     pip${PYTHON_VERSION} install numpy && \
     pip${PYTHON_VERSION} install pandas && \
     pip${PYTHON_VERSION} install SQLAlchemy && \
-    pip${PYTHON_VERSION} install psycopg2
+    pip${PYTHON_VERSION} install psycopg2 && \
+    pip${PYTHON_VERSION} install flask-restful
 # \Python libs b1
 
-
 # Running script
-RUN cd ${ENTRY_PATH}
+#RUN cd ${ENTRY_PATH}
 CMD python${PYTHON_VERSION} ./${ENTRY}
 # \Running script
 
