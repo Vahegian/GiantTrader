@@ -3,7 +3,7 @@ from binance.websockets import BinanceSocketManager
 import time
 from datetime import date, timedelta
 
-class BinanceCom:
+class Trader:
     def __init__(self):
         self.default_Key="api_key"
         self.default_Secret="api_secret"
@@ -105,13 +105,13 @@ class BinanceCom:
     @check_client
     def get_open_orders(self):
         content = self._client.get_open_orders()
-        features_to_include = ['orderId', 'price', 'origQty', 'executedQty', 'type', 'side', 'stopPrice']
-        orders = {}
+        features_to_include = ['symbol', 'orderId', 'price', 'origQty', 'executedQty', 'type', 'side', 'stopPrice']
+        orders = []
         for item in content:
             data = {}
             for feature in features_to_include:
                 data.update({feature:item[feature]})
-            orders.update({item['symbol']:data})
+            orders.append(data)
         return orders
 
     @watch_limit
@@ -158,7 +158,7 @@ class BinanceCom:
         return data
 
 if __name__ == "__main__":
-    bc = BinanceCom()
+    bc = Trader()
     # Create client which will send requests to exchange, default values will not enable trading.
     isConected = bc.connect_to_account(bc.default_Key, bc.default_Secret)
     # Get exchange request limits, values will be members of the class.
@@ -180,4 +180,6 @@ if __name__ == "__main__":
 
     #get historical OHLCV data
     print("\n", bc.get_hist_data_day_interval("XRPUSDT", 3))
+
+    
     

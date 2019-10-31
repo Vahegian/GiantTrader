@@ -6,24 +6,39 @@ class Connector:
         self._engine = None
         self._cur = None
 
-    def connect(self, db, user, password, host="docker_db_1", port="5432"):
-        self._engine = p2.connect(database = db, user = user, password = password, host = host, port = port)
-        self._cur = self._engine.cursor()
+    def check_engine(func):
+        def inner(self, *args, **kwargs):
+            if self._engine==None or self._cur==None:
+                print(f"\nError on call '{func.__name__}' \nPlease initialize 'postgres' db, use 'Connector.connect(db, user, password, host, port)' !!!")
+                return
+            else:
+                return func(self, *args, **kwargs)
+        return inner
 
+    def connect(self, db, user, password, host="docker_db_1", port="5432"):
+        try:
+            self._engine = p2.connect(database = db, user = user, password = password, host = host, port = port)
+            self._cur = self._engine.cursor()
+        except Exception as e:
+            print(str(e))
+    
+    @check_engine
     def create_table(self, tname, cols):
         self.execute(f'''CREATE TABLE {tname}
                     ({cols});''')
-
+    
+    @check_engine
     def drop_table(self, tname):
         self.execute(f'''DROP TABLE {tname};''')
         
-
+    @check_engine
     def insert_into_table(self, tname, cols, rows):
         self.execute(f'''INSERT INTO {tname}
                     ({cols})
                     VALUES
                     {rows};''')
 
+    @check_engine
     def select_from(self, tnames, cols, conds=None, order_col=None, dec=False, limit=None):
         options = [f"SELECT {cols}", f"FROM {tnames}", f"WHERE {conds}", f"ORDER BY {order_col}", "DESC", f"LIMIT {limit}"]
         opList = []
@@ -46,13 +61,11 @@ class Connector:
             qString+=" "+options[index]
         qString+=";"
         print(qString)
-        if self._cur!=None:
-            self._cur.execute(qString)
-            return self._cur.fetchall()
-        else:
-            print("Please initialize db, use 'Connector.connect()' !!!")
-            return
-    
+        
+        self._cur.execute(qString)
+        return self._cur.fetchall()
+        
+    @check_engine
     def update_table(self, tname, col, conds=None):
         options = [f"UPDATE {tname}", f"SET {col}" ,f"WHERE {conds}"]
         qString = ""
@@ -68,6 +81,7 @@ class Connector:
             qString+=";"
         self.execute(qString)
 
+    @check_engine
     def delete_from(self, tname, conds):
         options = [f"DELETE ", f"FROM {tname}" ,f"WHERE {conds}"]
         qString = ""
@@ -78,22 +92,18 @@ class Connector:
             qString+=options[0]+" "+options[1]+" "+options[2]+";"
         self.execute(qString)
         
-    
+    @check_engine
     def execute(self, command):
-        if self._engine==None or self._cur==None:
-            print("Please initialize db, use 'Connector.connect()' !!!")
-            return
         self._cur.execute(command)
         self._engine.commit()
         print(f"{command} OK.")
 
+    @check_engine
     def disconnect(self):
         self._engine.close()
-    # def list_dbs(self):
-        # if self._engine != None:
-            # insp = db.inspect(self._engine)
-            # return insp.get_schema_names()
-
+        self._engine = None
+        self._cur = None
+   
 
 if __name__ == "__main__":
     c = Connector()
@@ -114,5 +124,4 @@ if __name__ == "__main__":
     print(c.select_from("users", "*"))
     c.drop_table("users")
     c.disconnect()
-    # c.create_db("gian")
-    # print(c.list_dbs())
+    
