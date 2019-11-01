@@ -50,7 +50,7 @@ class Master:
         return self.__open_user_accounts[uname].get_last_prices()
 
     def get_user_ohlcv(self, uname, pair, for_num_of_days=7):
-        return self.__open_user_accounts[uname].get_ohlcv(pair, for_num_of_days)
+        return self.__open_user_accounts[uname].get_ohlcv(pair, for_num_of_days-1)
 
     def buy_lim_user(self, uname, pair, amount, price):
         self.__open_user_accounts[uname].buy_limit(pair, amount, price)
