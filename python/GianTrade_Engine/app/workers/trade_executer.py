@@ -10,6 +10,7 @@ class TradeExec:
         if not connected:
             raise ValueError(self.TAG, "ApiKey or Secret is Not Valid")
         self.__trader.update_request_limits()
+        self.fees = self.__trader.get_fees()
         
         self.__wallet = None
         self.__openOrders = []
@@ -46,3 +47,11 @@ class TradeExec:
 
     def get_ohlcv(self, pair, for_num_of_days):
         return self.__trader.get_hist_data_day_interval(pair, for_num_of_days)
+    
+    def get_pair_fees(self, pair):
+        if self.fees != None:
+            for item in self.fees["tradeFee"]:
+                if item["symbol"] == pair:
+                    return item
+        else:
+            return False

@@ -18,6 +18,7 @@ parser.add_argument('days')
 parser.add_argument('amount')
 parser.add_argument('price')
 parser.add_argument('orderId')
+parser.add_argument('fee')
 
 def wrap_with_try(func):
     def inner(*args, **kwargs):
@@ -118,10 +119,12 @@ class BuyLimit(Resource):
         pair = args['pair']
         amount = args['amount']
         price = args['price']
+        fee = args['fee']
+
         if not uname or not pair or not amount or not price:
-            return {"message":"add user name, pair, amount and price "}, 400
+            return {"message":"add user name, pair, amount, fee and price "}, 400
         else:
-            master.buy_lim_user(uname,pair,amount,price)
+            master.buy_lim_user(uname,pair,amount,price, fee)
             return {"message": f"Buy order for {pair} is placed"}, 201
 
 class SellLimit(Resource):
@@ -132,10 +135,11 @@ class SellLimit(Resource):
         pair = args['pair']
         amount = args['amount']
         price = args['price']
+        fee = args['fee']
         if not uname or not pair or not amount or not price:
-            return {"message":"add user name, pair, amount and price "}, 400
+            return {"message":"add user name, pair, amount, fee and price "}, 400
         else:
-            master.sell_lim_user(uname,pair,amount,price)
+            master.sell_lim_user(uname,pair,amount,price, fee)
             return {"message": f"Sell order for {pair} is placed"}, 201
 
 class CancelOrder(Resource):
@@ -145,12 +149,27 @@ class CancelOrder(Resource):
         uname = args['uname']
         pair = args['pair']
         orderid = args['orderId']
+        amount = args['amount']
+        price = args['price']
+        fee = args['fee']
+
+        if not uname or not pair or not orderid or not amount or not price:
+            return {"message":"add user name, pair, amount, price, fee and orderid "}, 400
+        else:
+            master.cancel_user_order(uname, pair, orderid, amount, price, fee)
+            return {"message": f"Cancelled order for {pair}"}, 201
+
+class GetPairFees(Resource):
+    @wrap_with_try
+    def post(self):
+        args = parser.parse_args()
+        uname = args['uname']
+        pair = args['pair']
         
-        if not uname or not pair or not orderid:
+        if not uname or not pair:
             return {"message":"add user name, pair and orderid "}, 400
         else:
-            master.cencel_user_order(uname, pair, orderid)
-            return {"message": f"Cancelled order for {pair}"}, 201
+            return master.get_user_pair_fee(uname, pair), 201
 
 api.add_resource(LogUser, '/inuser')
 api.add_resource(GetUwallet, '/ud/wallet')
@@ -161,6 +180,7 @@ api.add_resource(GetOHLCV, '/ohlcv')
 api.add_resource(BuyLimit, '/lbuy')
 api.add_resource(SellLimit, '/lsell')
 api.add_resource(CancelOrder, '/ocancel')
+api.add_resource(GetPairFees, '/pairfee')
 
 
 if __name__ == "__main__":

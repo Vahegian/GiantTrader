@@ -57,6 +57,12 @@ class Trader:
         self._last_req_time=timeinseconds
 
     @watch_limit 
+    @check_client
+    def get_fees(self):
+        return self._client.get_trade_fee()
+        
+
+    @watch_limit 
     @check_client   
     def update_request_limits(self):
         rates = self._client.get_exchange_info()['rateLimits']
