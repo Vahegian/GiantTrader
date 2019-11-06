@@ -24,6 +24,8 @@ class TradeExec:
     
     def update_open_orders(self):
         self.__openOrders = self.__trader.get_open_orders()
+        for item in self.__openOrders:
+            item.update({"fee":float(self.get_pair_fees(item["symbol"])["taker"])*100})
         return self.__openOrders
 
     def buy_limit(self, pair, amount, price):

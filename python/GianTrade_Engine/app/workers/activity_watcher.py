@@ -21,7 +21,7 @@ class ActivityWatch:
         
 
     def __get_last_Uid(self):
-        data = self.__db.select_from_table(self.USER_TABLE_NAME, ["*"])
+        data = self.__db.select_from_table(self.ACTIVITY_MONITOR_TABLE_NAME, ["*"])
         try:
             if len(data)>0:
                 uid = data[-1][0]

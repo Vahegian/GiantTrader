@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <title>Giant Trader</title>
+    <!-- My classes -->
+    <script src="/js/general.js"></script>
+    <link rel="stylesheet" href="/main/css/main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+    <script src="/main/js/chart.js"></script>
+
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap2-toggle.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <!-- Top -->
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body bg-light">
+                        <h4 class="card-title">Strategies</h4>
+                        <div class="row text-center">
+                            <div class="col"><button class="btn btn-primary btn-block" type="button">Start</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <ul>
+                                    <li>Item 1</li>
+                                    <li>Item 2</li>
+                                    <li>Item 3</li>
+                                    <li>Item 4</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col"><textarea class="form-control-lg" placeholder="Logs"
+                                    readonly=""></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body bg-light">
+                        <div>
+                            <h4>Users</h4>
+                            <div class="row">
+                                <div class="col"><input id="top_username_input" type="text" class="form-control-sm"
+                                        placeholder="Username">
+                                </div>
+                                <div class="col"><input id="top_user_password_input" type="password"
+                                        class="form-control-sm" placeholder="Password">
+                                </div>
+                                <div class="col"><button id="top_user_login_button" class="btn btn-success"
+                                        type="button">Login</button></div>
+                            </div>
+                            <ul id="top_logged_users_list" class="list-inline text-right">
+                                <!-- <li class="list-inline-item">Item 1</li> -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="card">
+                    <div class="card-body bg-light">
+                        <div>
+                            <h4>Live Prices</h4>
+                            <ul class="list-inline text-right">
+                                <li class="list-inline-item">Item 1</li>
+                                <li class="list-inline-item">Item 2</li>
+                                <li class="list-inline-item">Item 3</li>
+                                <li class="list-inline-item">Item 4</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- x Top x -->
+        <br>
+        <!-- Mid -->
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body bg-light">
+                        <h4 class="card-title">Limit orders</h4>
+
+                        <div class="row">
+                            <div class="col">
+                                <form>
+                                    <select id="user_Limit_order_pair_options" class="custom-select" id="inputGroupSelect01">
+                                        <option selected>None</option>
+                                    </select><br><br>
+                                    <input id="user_Limit_order_price_text" type="text" class="form-control"
+                                        placeholder="Price"><br>
+                                    <input id="user_Limit_order_amount_text" type="text" class="form-control"
+                                        placeholder="Amount"><br>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div role="group" class="btn-group">
+                                                <button id="user_Limit_sell_select_button" class="btn bg-white"
+                                                    type="button">Sell</button>
+                                                <button id="user_Limit_buy_select_button" class="btn bg-white"
+                                                    type="button">Buy</button>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="col">
+                                            <button id="user_Limit_place_order_button" class="btn btn-secondary"
+                                                type="button">Place Order</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Chart</h4>
+                        <div><canvas id="gtchart" style="display: block; width: 436px; height: 218px;" width="436"
+                                height="218"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <!-- </div> -->
+        <!-- x Mid x -->
+
+        <!-- Bottom -->
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body bg-light">
+                        <h4 class="card-title">Wallet</h4>
+                        <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Asset</th>
+                                            <th>Available</th>
+                                            <th>Working</th>
+                                            <th>Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="user_wallet_table">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col"><small class="form-text">Total</small></div>
+                            <div id="user_wallet_table_total" class="col"><small class="form-text">0.0</small></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body bg-light text-center">
+                        <h4 class="card-title">Open orders</h4>
+                        <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Pair</th>
+                                            <th>Side</th>
+                                            <th>Type</th>
+                                            <th>Price</th>
+                                            <th>Amount</th>
+                                            <th>Filled</th>
+                                            <th>Stop</th>
+                                            <th>Fee</th>
+                                            <th>X</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="user_open_orders_table">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- x Bottom x -->
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap2-toggle.min.js"></script>
+
+
+    <!-- <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+
+    <script>
+        new GTchart()
+    </script>
+
+    <!-- Run Logic -->
+    <!-- <script src="/main/js/chart.js"></script> -->
+
+    <script src="/main/js/dataAPI.js"></script>
+    <script src="/main/js/users.js"></script>
+
+    <script> on_login_clicked(loginUser) </script>
+</body>
+
+</html>

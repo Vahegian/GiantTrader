@@ -1,0 +1,38 @@
+.body {
+    height: 100%;
+}
+.container-fluid {
+    height: 100%;
+}
+
+.my-custom-scrollbar {
+    position: relative;
+    min-height: 100px;
+    max-height: 200px;
+    overflow: auto;
+}
+
+.my-custom-scrollbar thead th {
+    position: sticky;
+    top: 0;
+}
+
+.table-wrapper-scroll-y {
+    display: block;
+}
+
+.slow .toggle-group {
+    transition: left 0.7s;
+    -webkit-transition: left 0.7s;
+}
+
+.row{
+    width: auto !important;
+}
+
+
+
+.mcanvas {
+    width: 800px;
+    height: 300px;
+}

@@ -5,7 +5,9 @@ from flask_restful import Resource, Api, reqparse
 
 master = None
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', 
+            static_folder='web')
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 api = Api(app)
 
 parser = reqparse.RequestParser()
@@ -48,11 +50,13 @@ class LogUser(Resource):
             udata = master.get_user_data(uname, upass)
             print(udata)
             master.open_user_account(udata[1], udata[3], udata[4])
-            return {"message":"user logged in"}, 201
+            return {"message":"user logged in",
+                    "status":1,
+                    "uname":uname}, 201
 
 class GetUwallet(Resource):
     '''
-        'post' logged in user name to get user's wallet info.
+        'post' logged in "user name" to get user's wallet info.
     '''
     @wrap_with_try
     def post(self):
@@ -124,8 +128,9 @@ class BuyLimit(Resource):
         if not uname or not pair or not amount or not price:
             return {"message":"add user name, pair, amount, fee and price "}, 400
         else:
-            master.buy_lim_user(uname,pair,amount,price, fee)
-            return {"message": f"Buy order for {pair} is placed"}, 201
+            master.buy_lim_user(uname,pair,float(amount),float(price), fee)
+            return {"message": f"Buy order for {pair} is placed", 
+                    "status":1}, 201
 
 class SellLimit(Resource):
     @wrap_with_try
@@ -139,8 +144,9 @@ class SellLimit(Resource):
         if not uname or not pair or not amount or not price:
             return {"message":"add user name, pair, amount, fee and price "}, 400
         else:
-            master.sell_lim_user(uname,pair,amount,price, fee)
-            return {"message": f"Sell order for {pair} is placed"}, 201
+            master.sell_lim_user(uname,pair,float(amount),float(price), fee)
+            return {"message": f"Sell order for {pair} is placed", 
+                    "status":1}, 201
 
 class CancelOrder(Resource):
     @wrap_with_try
@@ -157,7 +163,9 @@ class CancelOrder(Resource):
             return {"message":"add user name, pair, amount, price, fee and orderid "}, 400
         else:
             master.cancel_user_order(uname, pair, orderid, amount, price, fee)
-            return {"message": f"Cancelled order for {pair}"}, 201
+            return {"message": f"Cancelled order for {pair}", 
+                    "status":1,
+                    "orderID":orderid}, 201
 
 class GetPairFees(Resource):
     @wrap_with_try
