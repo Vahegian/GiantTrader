@@ -8,7 +8,7 @@
     <script src="/js/general.js"></script>
     <link rel="stylesheet" href="/main/css/main.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
-    <script src="/main/js/chart.js"></script>
+    <!-- <script src="/main/js/chart.js"></script> -->
 
 
     <!-- Required meta tags -->
@@ -22,66 +22,45 @@
 </head>
 
 <body>
-    <div class="container-fluid">
+    <div class="container-fluid body_color">
         <!-- Top -->
         <div class="row">
             <div class="col">
                 <div class="card">
-                    <div class="card-body bg-light">
-                        <h4 class="card-title">Strategies</h4>
-                        <div class="row text-center">
-                            <div class="col"><button class="btn btn-primary btn-block" type="button">Start</button>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <ul>
-                                    <li>Item 1</li>
-                                    <li>Item 2</li>
-                                    <li>Item 3</li>
-                                    <li>Item 4</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col"><textarea class="form-control-lg" placeholder="Logs"
-                                    readonly=""></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <div class="card-body bg-light">
-                        <div>
-                            <h4>Users</h4>
-                            <div class="row">
-                                <div class="col"><input id="top_username_input" type="text" class="form-control-sm"
-                                        placeholder="Username">
-                                </div>
-                                <div class="col"><input id="top_user_password_input" type="password"
-                                        class="form-control-sm" placeholder="Password">
-                                </div>
-                                <div class="col"><button id="top_user_login_button" class="btn btn-success"
-                                        type="button">Login</button></div>
-                            </div>
-                            <ul id="top_logged_users_list" class="list-inline text-right">
-                                <!-- <li class="list-inline-item">Item 1</li> -->
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <br>
-                <div class="card">
-                    <div class="card-body bg-light">
+                    <div class="card-body card-body-color">
                         <div>
                             <h4>Live Prices</h4>
-                            <ul class="list-inline text-right">
+                            <ul id="user_live_prices_list" class="list-inline text-right">
                                 <li class="list-inline-item">Item 1</li>
                                 <li class="list-inline-item">Item 2</li>
                                 <li class="list-inline-item">Item 3</li>
                                 <li class="list-inline-item">Item 4</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+
+            <div class="col">
+                <div class="card">
+                    <div class="card-body card-body-color">
+                        <div>
+                            <h4>Users</h4>
+                            <div class="row">
+
+                                <div class="col">
+                                    <input id="top_username_input" type="text" class="form-control-sm"
+                                        placeholder="Username">
+                                    <input id="top_user_password_input" type="password" class="form-control-sm"
+                                        placeholder="Password">
+                                </div>
+                                <div class="col"><button id="top_user_login_button" class="btn btn-success"
+                                        type="button">Login</button>
+                                </div>
+                            </div>
+                            <ul id="top_logged_users_list" class="list-inline text-right">
+                                <!-- <li class="list-inline-item">Item 1</li> -->
                             </ul>
                         </div>
                     </div>
@@ -94,15 +73,13 @@
         <div class="row">
             <div class="col">
                 <div class="card">
-                    <div class="card-body bg-light">
+                    <div class="card-body card-body-color">
                         <h4 class="card-title">Limit orders</h4>
-
                         <div class="row">
                             <div class="col">
                                 <form>
-                                    <select id="user_Limit_order_pair_options" class="custom-select" id="inputGroupSelect01">
-                                        <option selected>None</option>
-                                    </select><br><br>
+                                    <select id="user_Limit_order_pair_options" class="custom-select"
+                                        id="inputGroupSelect01"></select><br><br>
                                     <input id="user_Limit_order_price_text" type="text" class="form-control"
                                         placeholder="Price"><br>
                                     <input id="user_Limit_order_amount_text" type="text" class="form-control"
@@ -127,76 +104,118 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col">
+                <br>
                 <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">Chart</h4>
-                        <div><canvas id="gtchart" style="display: block; width: 436px; height: 218px;" width="436"
-                                height="218"></canvas></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <br>
-        <!-- </div> -->
-        <!-- x Mid x -->
-
-        <!-- Bottom -->
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-body bg-light">
+                    <div class="card-body card-body-color">
                         <h4 class="card-title">Wallet</h4>
-                        <div class="table-wrapper-scroll-y my-custom-scrollbar">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Asset</th>
-                                            <th>Available</th>
-                                            <th>Working</th>
-                                            <th>Price</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="user_wallet_table">
+                        <div class="table-responsive table-wrapper-scroll-y my-custom-scrollbar">
+                            <table class="table">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Asset</th>
+                                        <th>Available</th>
+                                        <th>Working</th>
+                                        <th>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="user_wallet_table">
 
-                                    </tbody>
-                                </table>
-                            </div>
+                                </tbody>
+                            </table>
                         </div>
                         <div class="row">
-                            <div class="col"><small class="form-text">Total</small></div>
+                            <div class="col">
+                                <div class="form-text">Total</div>
+                            </div>
                             <div id="user_wallet_table_total" class="col"><small class="form-text">0.0</small></div>
                         </div>
                     </div>
                 </div>
             </div>
+            <br>
             <div class="col">
                 <div class="card">
-                    <div class="card-body bg-light text-center">
+                    <div class="card-body card-body-color">
+                        <div class="row">
+                            <div class="col">
+                                <select id="user_chart_pair_options" class="custom-select"
+                                    id="inputGroupSelect01"></select>
+                            </div>
+                            <div class="col">
+                                <select id="user_chart_days_options" class="custom-select" id="inputGroupSelect01">
+                                    <option>7</option>
+                                    <option>30</option>
+                                    <option>90</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <button id="user_chart_button" class="btn btn-primary" type="button">Chart</button>
+                            </div>
+                        </div>
+                        <br>
+                        <div id="user_chart_canvas_div"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- </div> -->
+        <!-- x Mid x -->
+        <br>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body card-body-color text-center">
                         <h4 class="card-title">Open orders</h4>
                         <div class="table-wrapper-scroll-y my-custom-scrollbar">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Pair</th>
-                                            <th>Side</th>
-                                            <th>Type</th>
-                                            <th>Price</th>
-                                            <th>Amount</th>
-                                            <th>Filled</th>
-                                            <th>Stop</th>
-                                            <th>Fee</th>
-                                            <th>X</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="user_open_orders_table">
+                            <table class="table">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Pair</th>
+                                        <th>Side</th>
+                                        <th>Type</th>
+                                        <th>Price</th>
+                                        <th>Amount</th>
+                                        <th>Filled</th>
+                                        <th>Stop</th>
+                                        <th>Fee</th>
+                                        <th>X</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="user_open_orders_table">
 
-                                    </tbody>
-                                </table>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <!-- Bottom -->
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body card-body-color">
+                        <h4 class="card-title">Strategies</h4>
+                        <div class="row text-center">
+                            <div class="col"><button class="btn btn-primary btn-block" type="button">Start</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <ul>
+                                    <li>Item 1</li>
+                                    <li>Item 2</li>
+                                    <li>Item 3</li>
+                                    <li>Item 4</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col"><textarea class="form-control-lg" placeholder="Logs"
+                                    readonly=""></textarea>
                             </div>
                         </div>
                     </div>
@@ -224,9 +243,9 @@
     <!-- <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script> -->
     <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
 
-    <script>
-        new GTchart()
-    </script>
+    <!-- <script>
+        var gtchart = new GTchart()
+    </script> -->
 
     <!-- Run Logic -->
     <!-- <script src="/main/js/chart.js"></script> -->

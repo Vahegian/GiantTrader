@@ -13,6 +13,12 @@ var user_Limit_buy_select_button = document.getElementById("user_Limit_buy_selec
 var user_Limit_place_order_button = document.getElementById("user_Limit_place_order_button");
 var user_Limit_order_pair_options = document.getElementById("user_Limit_order_pair_options");
 
+var user_live_prices_list = document.getElementById("user_live_prices_list");
+
+var user_chart_pair_options = document.getElementById("user_chart_pair_options");
+var user_chart_button = document.getElementById("user_chart_button");
+var user_chart_days_options = document.getElementById("user_chart_days_options");
+var user_chart_canvas_div = document.getElementById("user_chart_canvas_div");
 
 var default_asset = "USDT";
 
@@ -27,11 +33,76 @@ var last_wallet_state = null;
 var sorted_pairs = null;
 var pairs_fees = null;
 
+
 var total_money_in_wallet = 0.0;
 
 var open_orders_cancel_button_listeners = {} // remember to clear this when user is changed 
 
 var user_Limit_order_side = 0; // 0-buy, 1-sell
+
+var live_prices_to_show = ["BTCUSDT", "ETHUSDT", "XRPUSDT", "BNBUSDT", "LTCUSDT"]
+
+function chart_data(data, code) {
+    var labels = []
+    var dataset = []
+    for (var key in data) {
+        labels.push(key);
+        dataset.push(parseFloat(data[key].close))
+    }
+    // console.log(labels);
+    // console.log(dataset);
+    user_chart_canvas_div.innerHTML = `
+    <canvas id="gtchart" style="display: block;"></canvas>`
+    var mChart = document.getElementById('gtchart').getContext('2d');
+
+    new Chart(mChart, {
+        type:'line',
+        data:{
+            labels:labels,
+            datasets:[{
+                label:'',
+                data:dataset,
+                backgroundColor: "rgba(0, 255, 0, 0.4)"
+            }]
+        },
+        options:{
+            legend:{ display: false},
+            responsive: true,
+            // Boolean - whether to maintain the starting aspect ratio or not when responsive, if set to false, will take up entire container
+            maintainAspectRatio: true,}
+    });
+}
+
+function enable_user_chart() {
+    user_chart_button.addEventListener("click", function () {
+        if (sorted_pairs != null) {
+            var pair = user_chart_pair_options.value
+            var days = user_chart_days_options.value
+            get_ohlc(chart_data, pair, days);
+        }
+    })
+}
+
+function populate_options_object(object, list_of_data) {
+    // object.innerHTML = ''
+    if (object.innerHTML == '') {
+        for (var index in list_of_data) {
+            var option_item = document.createElement("option");
+            var text_item = document.createTextNode(list_of_data[index]);
+            option_item.appendChild(text_item);
+            object.appendChild(option_item)
+        }
+    }
+}
+
+function enable_user_pair_selection() {
+    if (sorted_pairs == null) {
+        sort_user_pairs()
+    } else {
+        populate_options_object(user_chart_pair_options, sorted_pairs);
+        populate_options_object(user_Limit_order_pair_options, sorted_pairs);
+    }
+}
 
 function update_pair_fees(data, code) {
     if (pairs_fees == null) {
@@ -52,36 +123,41 @@ function update_user_limit_order_side(side) {
     }
 }
 
-function update_user_data_if_success(data, code){
-    if (data["status"]==1){
+function update_user_data_if_success(data, code) {
+    if (data["status"] == 1) {
         update_user_data();
     }
 }
 
-function set_user_limit_order_side_button_listeners() {
-    user_Limit_order_pair_options.addEventListener("click", function () {
-        if (last_prices != null) {
-            if (sorted_pairs == null) {
-                alert("Getting pairs might take a while. Please wait!")
-                var pairs = Object.keys(last_prices)
-                sorted_pairs = []
-                for (var index in pairs) {
-                    if (pairs[index].substr(pairs[index].length - 4) == "USDT") {
-                        sorted_pairs.push(pairs[index])
-                        get_pair_fee(update_pair_fees, pairs[index])
-                    }
-                }
-                sorted_pairs.sort();
-                alert("Pairs are ready!")
-            }
-            for (var index in sorted_pairs) {
-                var option_item = document.createElement("option");
-                var text_item = document.createTextNode(sorted_pairs[index]);
-                option_item.appendChild(text_item);
-                user_Limit_order_pair_options.appendChild(option_item)
+function sort_user_pairs() {
+    if (last_prices != null && sorted_pairs == null) {
+        // alert("Getting pairs might take a while. Please wait!")
+        var pairs = Object.keys(last_prices)
+        sorted_pairs = []
+        for (var index in pairs) {
+            if (pairs[index].substr(pairs[index].length - 4) == "USDT") {
+                sorted_pairs.push(pairs[index])
+                get_pair_fee(update_pair_fees, pairs[index])
             }
         }
-    });
+        sorted_pairs.sort();
+    }
+}
+function set_user_limit_order_side_button_listeners() {
+    // user_Limit_order_pair_options.addEventListener("click", function () {
+    //     if (last_prices != null) {
+    //         if (sorted_pairs == null) {
+    //             sort_user_pairs()
+    //         }
+    //         populate_options_object(user_Limit_order_pair_options, sorted_pairs);
+    //         // for (var index in sorted_pairs) {
+    //         //     var option_item = document.createElement("option");
+    //         //     var text_item = document.createTextNode(sorted_pairs[index]);
+    //         //     option_item.appendChild(text_item);
+    //         //     user_Limit_order_pair_options.appendChild(option_item)
+    //         // }
+    //     }
+    // });
 
     user_Limit_sell_select_button.addEventListener("click", function () {
         user_Limit_order_side = 1;
@@ -99,13 +175,13 @@ function set_user_limit_order_side_button_listeners() {
             var order_amount = parseFloat(user_Limit_order_amount_text.value)
             var order_price = parseFloat(user_Limit_order_price_text.value)
             if (order_amount * order_price >= 10.0) {
-                if (user_Limit_order_side==1){
+                if (user_Limit_order_side == 1) {
                     sell_limit(update_user_data_if_success, order_pair, order_amount, order_price, pairs_fees[order_pair])
-                }else if(user_Limit_order_side==0){
-                    buy_limit(update_user_data_if_success, order_pair, order_amount, order_price, pairs_fees[order_pair])                    
+                } else if (user_Limit_order_side == 0) {
+                    buy_limit(update_user_data_if_success, order_pair, order_amount, order_price, pairs_fees[order_pair])
                 }
-                user_Limit_order_amount_text.value =''
-                user_Limit_order_price_text.value=''
+                user_Limit_order_amount_text.value = ''
+                user_Limit_order_price_text.value = ''
             }
         } catch{
             alert("Limit order: typed data is inaccurate!")
@@ -140,8 +216,25 @@ function update_user_wallet(data, code) {
     last_wallet_state = data;
 }
 
+var temp_prices = {}
 function update_user_last_prices(data, code) {
     last_prices = data;
+    user_live_prices_list.innerHTML = '';
+    for (var index in live_prices_to_show) {
+        var pair = live_prices_to_show[index]
+        var price = parseFloat(last_prices[pair]).toFixed(3)
+        if (price > temp_prices[pair]) {
+            user_live_prices_list.innerHTML += `
+            <li class="list-inline-item"><p class="text-success">`+ pair + " : " + price + `</p></li>
+            `
+        } else {
+            user_live_prices_list.innerHTML += `
+            <li class="list-inline-item"><p class="text-danger">`+ pair + " : " + price + `</p></li>
+            `
+        }
+        temp_prices[pair] = price
+
+    }
     // console.log(data)
 }
 
@@ -263,6 +356,16 @@ function update_UI() {
 
 update_user_limit_order_side(user_Limit_order_side);
 set_user_limit_order_side_button_listeners();
+
+user_chart_pair_options.addEventListener("click", function () {
+    enable_user_pair_selection();
+});
+
+user_Limit_order_pair_options.addEventListener("click", function () {
+    enable_user_pair_selection();
+});
+
+enable_user_chart();
 
 var user_login_check_interval = setInterval(check_user_login_status, 1000);
 var ui_update_interval = setInterval(update_UI, 2000);

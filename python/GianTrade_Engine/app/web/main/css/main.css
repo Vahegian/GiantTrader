@@ -1,14 +1,23 @@
-.body {
+.card-body-color{
+    background-color: whitesmoke;
+}
+.body_color {
     height: 100%;
+    background-color: #000000;
 }
 .container-fluid {
     height: 100%;
 }
 
+.limit-top-div-hight{
+    min-height: 80px;
+    max-height: 80px;
+}
+
 .my-custom-scrollbar {
     position: relative;
-    min-height: 100px;
-    max-height: 200px;
+    min-height: 250px;
+    max-height: 250px;
     overflow: auto;
 }
 

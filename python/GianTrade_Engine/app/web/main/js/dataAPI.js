@@ -6,6 +6,7 @@ var u_cancel_open_order_url = "/ocancel"
 var u_sell_limit_url = "/lsell"
 var u_buy_limit_url = "/lbuy"
 var u_get_pair_fee_url = "/pairfee"
+var u_get_ohlc_url = "/ohlcv"
 
 function post(url, data, callback) {
     $.post(url, data, function (resp, code) {
@@ -94,6 +95,15 @@ function get_pair_fee(callback, pair){
     if (logged_in_user_name !=null){
         var udata = {"uname":logged_in_user_name, "pair":pair}
         post(u_get_pair_fee_url, udata, callback)
+    }else{
+        alert("User is not Logged in!")
+    }
+}
+
+function get_ohlc(callback, pair, days){
+    if (logged_in_user_name !=null){
+        var udata = {"uname":logged_in_user_name, "pair":pair, "days":days}
+        post(u_get_ohlc_url, udata, callback)
     }else{
         alert("User is not Logged in!")
     }
