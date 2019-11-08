@@ -21,6 +21,9 @@ parser.add_argument('amount')
 parser.add_argument('price')
 parser.add_argument('orderId')
 parser.add_argument('fee')
+parser.add_argument('strategy_name')
+parser.add_argument('strategy_option')
+
 
 def wrap_with_try(func):
     def inner(*args, **kwargs):
@@ -179,6 +182,35 @@ class GetPairFees(Resource):
         else:
             return master.get_user_pair_fee(uname, pair), 201
 
+class Strategies(Resource):
+    @wrap_with_try
+    def get(self):
+        return master.get_all_strategies(), 201
+
+    @wrap_with_try
+    def post(self):
+        args = parser.parse_args()
+        uname = args['uname']
+        pair = args['pair']
+        s_name = args['strategy_name']
+        s_option = args['strategy_option']
+        
+        if not uname or not pair or not s_name or not s_option:
+            return {"message" : "add 'uname', 'pair', 'strategy_option' and 'strategy_name'"}, 400
+        else:
+            if s_option == "start":
+                if master.start_strategy(s_name, uname, pair):
+                    return {"message" : f"strategy with id {s_name} started", "status":1}, 201
+            elif s_option == "stop":
+                if master.stop_strategy(s_name, uname, pair):
+                    return {"message" : f"strategy with id {s_name} stopped", "status":1}, 201
+            elif s_option == "log":
+                return master.get_strategy_log(s_name, uname, pair), 201
+            elif s_option == "running":
+                return master.get_running_strategies(uname), 201
+            else:
+                return {"message" : f"s_option '{s_option}' is not available", "status":0}, 400
+
 api.add_resource(LogUser, '/inuser')
 api.add_resource(GetUwallet, '/ud/wallet')
 api.add_resource(GetUOpenOrders, '/ud/oorders')
@@ -189,6 +221,7 @@ api.add_resource(BuyLimit, '/lbuy')
 api.add_resource(SellLimit, '/lsell')
 api.add_resource(CancelOrder, '/ocancel')
 api.add_resource(GetPairFees, '/pairfee')
+api.add_resource(Strategies, '/strategies')
 
 
 if __name__ == "__main__":

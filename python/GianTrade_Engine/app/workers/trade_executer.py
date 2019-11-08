@@ -13,7 +13,7 @@ class TradeExec:
         self.fees = self.__trader.get_fees()
         
         self.__wallet = None
-        self.__openOrders = []
+        # self.__openOrders = []
         self.__prices = {}
         self.start_price_tickers()
 
@@ -30,7 +30,7 @@ class TradeExec:
 
     def buy_limit(self, pair, amount, price):
         self.__trader.put_limit_order_buy(pair, amount, price)
-    
+            
     def sell_limit(self, pair, amount, price):
         self.__trader.put_limit_order_sell(pair, amount, price)
 

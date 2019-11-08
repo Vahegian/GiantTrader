@@ -139,17 +139,17 @@
                         <div class="row">
                             <div class="col">
                                 <select id="user_chart_pair_options" class="custom-select"
-                                    id="inputGroupSelect01"></select>
+                                    ></select>
                             </div>
                             <div class="col">
-                                <select id="user_chart_days_options" class="custom-select" id="inputGroupSelect01">
+                                <select id="user_chart_days_options" class="custom-select">
                                     <option>7</option>
                                     <option>30</option>
                                     <option>90</option>
                                 </select>
                             </div>
                             <div class="col">
-                                <button id="user_chart_button" class="btn btn-primary" type="button">Chart</button>
+                                <button id="user_chart_button" class="btn btn-primary" type="button">Plot</button>
                             </div>
                         </div>
                         <br>
@@ -158,7 +158,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- </div> -->
         <!-- x Mid x -->
         <br>
@@ -199,23 +199,34 @@
                 <div class="card">
                     <div class="card-body card-body-color">
                         <h4 class="card-title">Strategies</h4>
-                        <div class="row text-center">
-                            <div class="col"><button class="btn btn-primary btn-block" type="button">Start</button>
-                            </div>
-                        </div>
                         <div class="row">
+                            <div class="col"><ul id="strategies_log_list"></ul></div>
                             <div class="col">
-                                <ul>
-                                    <li>Item 1</li>
-                                    <li>Item 2</li>
-                                    <li>Item 3</li>
-                                    <li>Item 4</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col"><textarea class="form-control-lg" placeholder="Logs"
-                                    readonly=""></textarea>
+                                <div class="row">
+                                    <div class="col">
+                                        <select id="strategies_strategy_selector" class="custom-select"></select>
+                                    </div>
+                                    <div class="col">
+                                        <select id="strategies_pair_selector" class="custom-select"></select>
+                                    </div>
+                                    <div class="col">
+                                        <button id="strategies_start_button" class="btn btn-success" type="button">Start</button>
+                                    </div>
+                                    <div class="col">
+                                        <button id="strategies_stop_button" class="btn btn-danger" type="button">Stop</button>
+                                    </div>
+                                    <div class="col">
+                                        <button id="strategies_log_button" class="btn btn-info" type="button">Log</button>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col">
+                                        <ul id="strategies_running_list">
+                                            
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -252,6 +263,7 @@
 
     <script src="/main/js/dataAPI.js"></script>
     <script src="/main/js/users.js"></script>
+    <script src="/main/js/strategies.js"></script>
 
     <script> on_login_clicked(loginUser) </script>
 </body>

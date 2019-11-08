@@ -2,6 +2,7 @@ from db.db_manager import DBManager
 from workers.user_manager import UserManager
 from workers.trade_executer import TradeExec
 from workers.activity_watcher import ActivityWatch
+from private.strategies.one_m_5_d import OM5D 
 
 class Master:
     def __init__(self, dbuname, dbpass):
@@ -14,9 +15,43 @@ class Master:
         self.__db = DBManager(self.__db_name, dbuname, dbpass, self.__host, self.__port)
         self.__uManager = UserManager(self.__db)
         self.__actWatch= ActivityWatch(self.__db) 
+        self.__strategies = {"OM5D":OM5D}
+        self.__strategies_user_dict = {}
+
         
-        
-        
+    def start_strategy(self, strategy_name, uname, pair):
+        s = self.__strategies[strategy_name](self, uname, pair)
+        s.start()
+        # self.__strategies_user_dict.update({str(strategy_name)+uname+pair:s})
+        self.__strategies_user_dict.update({uname:{strategy_name:{pair:s}}})
+        return True
+    
+    def stop_strategy(self, strategy_name, uname, pair):
+        try:
+            # self.__strategies_user_dict[str(strategy_name)+uname+pair].stop()
+            self.__strategies_user_dict[uname][strategy_name][pair].stop()
+            self.__strategies_user_dict[uname][strategy_name].pop(pair)
+            return True
+        except:
+            return False
+
+    def get_all_strategies(self):
+        return list(self.__strategies.keys())
+    
+    def get_strategy_log(self, strategy_name, uname, pair):
+        try:
+            return self.__strategies_user_dict[uname][strategy_name][pair].get_log()
+        except:
+            return False
+    
+    def get_running_strategies(self, uname):
+        running = {}
+        for strategy in list(self.__strategies_user_dict[uname].keys()):
+            for pair in list(self.__strategies_user_dict[uname][strategy].keys()):
+                running.update({strategy:pair})
+        return running
+
+
     def get_user_data(self, uname, password):
         '''
             returns an array containing user details. 
@@ -52,19 +87,19 @@ class Master:
     def get_user_ohlcv(self, uname, pair, for_num_of_days=7):
         return self.__open_user_accounts[uname].get_ohlcv(pair, for_num_of_days-1)
 
-    def buy_lim_user(self, uname, pair, amount, price, fee=0.001):
+    def buy_lim_user(self, uname, pair, amount, price, fee=0.1):
         with self.__actWatch.record() as rec:
             self.__open_user_accounts[uname].buy_limit(pair, amount, price)
             rec.update({"uname":uname, "action":"BUY", "pair":pair, 
                         "amount":amount, "price":price, "fee":fee})
 
-    def sell_lim_user(self, uname, pair, amount, price, fee=0.001):
+    def sell_lim_user(self, uname, pair, amount, price, fee=0.1):
         with self.__actWatch.record() as rec:
             self.__open_user_accounts[uname].sell_limit(pair, amount, price)
             rec.update({"uname":uname, "action":"SELL", "pair":pair, 
                         "amount":amount, "price":price, "fee":fee})
 
-    def cancel_user_order(self, uname, pair, orderId, amount, price, fee=0.001):
+    def cancel_user_order(self, uname, pair, orderId, amount, price, fee=0.1):
         with self.__actWatch.record() as rec:
             self.__open_user_accounts[uname].cancel_order(pair, orderId)
             rec.update({"uname":uname, "action":"CANCEL", "pair":pair, 

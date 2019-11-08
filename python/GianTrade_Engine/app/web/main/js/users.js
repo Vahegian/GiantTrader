@@ -26,6 +26,7 @@ var logged_in_user_name = null;
 var can_update_user_data = false;
 var user_update_interval = null;
 var started_update_timer = false;
+var update_pair_selection = true;
 
 var last_prices = null;
 var last_open_orders = null;
@@ -98,6 +99,8 @@ function populate_options_object(object, list_of_data) {
 function enable_user_pair_selection() {
     if (sorted_pairs == null) {
         sort_user_pairs()
+        populate_options_object(user_chart_pair_options, sorted_pairs);
+        populate_options_object(user_Limit_order_pair_options, sorted_pairs);
     } else {
         populate_options_object(user_chart_pair_options, sorted_pairs);
         populate_options_object(user_Limit_order_pair_options, sorted_pairs);
@@ -144,21 +147,6 @@ function sort_user_pairs() {
     }
 }
 function set_user_limit_order_side_button_listeners() {
-    // user_Limit_order_pair_options.addEventListener("click", function () {
-    //     if (last_prices != null) {
-    //         if (sorted_pairs == null) {
-    //             sort_user_pairs()
-    //         }
-    //         populate_options_object(user_Limit_order_pair_options, sorted_pairs);
-    //         // for (var index in sorted_pairs) {
-    //         //     var option_item = document.createElement("option");
-    //         //     var text_item = document.createTextNode(sorted_pairs[index]);
-    //         //     option_item.appendChild(text_item);
-    //         //     user_Limit_order_pair_options.appendChild(option_item)
-    //         // }
-    //     }
-    // });
-
     user_Limit_sell_select_button.addEventListener("click", function () {
         user_Limit_order_side = 1;
         update_user_limit_order_side(user_Limit_order_side)
@@ -234,6 +222,11 @@ function update_user_last_prices(data, code) {
         }
         temp_prices[pair] = price
 
+    }
+
+    if (update_pair_selection && last_prices!=null){
+        enable_user_pair_selection();
+        update_pair_selection = false;
     }
     // console.log(data)
 }
@@ -356,14 +349,6 @@ function update_UI() {
 
 update_user_limit_order_side(user_Limit_order_side);
 set_user_limit_order_side_button_listeners();
-
-user_chart_pair_options.addEventListener("click", function () {
-    enable_user_pair_selection();
-});
-
-user_Limit_order_pair_options.addEventListener("click", function () {
-    enable_user_pair_selection();
-});
 
 enable_user_chart();
 
