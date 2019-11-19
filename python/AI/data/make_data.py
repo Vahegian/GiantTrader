@@ -1,7 +1,7 @@
 '''
 This script takes one 'npy' file that contains market data 
 of multiple markets and produces a file.
-These file contains 4x7 images of the markets (each image holds 7 days of OHLC data)
+The file contains 4x7x1 images of the markets (each image holds 7 days of OHLC data)
 and buy or sell signals associated with the images. 
 '''
 
@@ -74,25 +74,30 @@ def get_OHLC_bin_images(data, file_to_save, days=7, dec_days=3): # des_days - de
                         image[0][x] = num_map(high[i+x], min_of_the_market, max_of_the_market) # convert market value to be between 0 and 1
                         image[1][x] = num_map(close[i+x], min_of_the_market, max_of_the_market) # [0] - top row of image, [3] bottom row of image.
                         image[2][x] = num_map(ope_n[i+x], min_of_the_market, max_of_the_market)
-                        image[3][x] = num_map(low[i+x], min_of_the_market, max_of_the_market)
+                        image[3][x]= num_map(low[i+x], min_of_the_market, max_of_the_market)
                         save_img = True
                     
                     pre = np.average(close[(i+days)-dec_days:i+days])
                     post = np.average(close[i+days:i+days+dec_days])
                     
-                    decision = np.array([0]) # [1]-buy, [0]-sell                    
+                    decision = np.array([0, 1],dtype="float32") # [1, 0]-buy, [0, 1]-sell                                    
                     if pre < post:
-                        decision[0]=1
-                        
+                        decision = np.array([1, 0],dtype="float32")
                     if save_img:
-                        ohlc_bin_imgs.append(np.array([image, decision]))
+                        image = np.reshape(image, (1, 4, 7))
+                        data_sample = np.array([image, decision])
+                        ohlc_bin_imgs.append(data_sample)
+                        # if len(ohlc_bin_imgs)==0:
+                        #     ohlc_bin_imgs = np.array([data_sample])
+                        # else:
+                        #     ohlc_bin_imgs = np.concatenate((ohlc_bin_imgs, [data_sample]), axis=0)
                 else:
                     break
             except Exception as e:
-                print(str(e), market_name)
-                
-    np.save(file_to_save, np.array(ohlc_bin_imgs))
-    print(os.getpid(), f"saved file '{file_to_save}' file length={len(ohlc_bin_imgs)}")
+                print("ERROR : ", str(e), market_name)
+    ohlc_bin_imgs = np.array(ohlc_bin_imgs)           
+    np.save(file_to_save, ohlc_bin_imgs)
+    print(os.getpid(), f"saved file '{file_to_save}' file length={len(ohlc_bin_imgs)} \n{ohlc_bin_imgs}")
 
 
 # # create 3 processes to prepare data in parallel to save time. 

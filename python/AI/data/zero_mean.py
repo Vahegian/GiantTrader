@@ -14,10 +14,13 @@ def save_file(dir, data):
 _FILE = "data/private/cnn_data.npy"
 
 _FILE = np.load(_FILE, allow_pickle=True)
-
+# print(_FILE)
+# exit(0)
+# substract mean image 
 mean_img = np.mean(_FILE, axis=0)[0]
-print(f"Total data length is '{len(_FILE)}', and 'mean img' is '{mean_img}'")
+print(f"\nTotal data length is '{len(_FILE)}', and 'mean img' is \n'{mean_img}'")
 
+print("\n substracting mean img....")
 for i in range(len(_FILE)):
     _FILE[i][0] -= mean_img
 
