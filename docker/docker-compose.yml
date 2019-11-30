@@ -1,10 +1,11 @@
 version: '3.5'
 services:
   py:
-    build: ~/Projects/GiantTrader/docker/gian_trade_engine/
+    build: ./gian_trade_engine/
+    container_name: docker_py_1 
     restart: always
     volumes:
-      - ~/Projects/GiantTrader/python/GianTrade_Engine/app:/usr/src/app
+      - ../python/GianTrade_Engine/app:/usr/src/app
     networks:
       - backend
     ports:
@@ -19,13 +20,14 @@ services:
   
   db:
     image: postgres:12.0
+    container_name: docker_db_1
     restart: always
     environment:
       POSTGRES_PASSWORD: pass
       POSTGRES_USER: myuser
       POSTGRES_DB: db
     volumes:
-      - ~/Projects/GiantTrader/docker/gian_trade_db/data:/var/lib/postgresql/data
+      - ./gian_trade_db/data:/var/lib/postgresql/data
     networks:
       - backend
     ports:
