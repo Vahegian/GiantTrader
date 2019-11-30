@@ -50,13 +50,13 @@ class UserManager:
                                 [f"{self.USER_TABLE_COLS[1]}='{uname}'",
                                  f"{self.USER_TABLE_COLS[2]}='{password}'"])[0]
 
-    def test_run(self):
-        self.__db.create_table(self.USER_TABLE_NAME, self.USER_TABLE_COLS, self.USER_TABLE_COL_TYPES)
-        self.__db.insert_to_table(self.USER_TABLE_NAME, self.USER_TABLE_COLS, ['1', "'vahe'", "'pass'","'api'", "'sec'"])                
-        self.__db.insert_to_table(self.USER_TABLE_NAME, self.USER_TABLE_COLS, ['2', "'vahe'", "'pass'","'api'", "'sec'"])
-        print(self.__db.select_from_table(self.USER_TABLE_NAME, ["*"]))
-        self.__db.update_table(self.USER_TABLE_NAME, ["name"], ["'Kola'"], "id='2'")
-        print(self.__db.select_from_table(self.USER_TABLE_NAME, ["*"]))
-        self.__db.delete_from_table(self.USER_TABLE_NAME, "id='1'")
-        print(self.__db.select_from_table(self.USER_TABLE_NAME, ["*"]))
-        self.__db.drop_table(self.USER_TABLE_NAME)
+    # def test_run(self):
+    #     self.__db.create_table(self.USER_TABLE_NAME, self.USER_TABLE_COLS, self.USER_TABLE_COL_TYPES)
+    #     self.__db.insert_to_table(self.USER_TABLE_NAME, self.USER_TABLE_COLS, ['1', "'vahe'", "'pass'","'api'", "'sec'"])                
+    #     self.__db.insert_to_table(self.USER_TABLE_NAME, self.USER_TABLE_COLS, ['2', "'vahe'", "'pass'","'api'", "'sec'"])
+    #     print(self.__db.select_from_table(self.USER_TABLE_NAME, ["*"]))
+    #     self.__db.update_table(self.USER_TABLE_NAME, ["name"], ["'Kola'"], "id='2'")
+    #     print(self.__db.select_from_table(self.USER_TABLE_NAME, ["*"]))
+    #     self.__db.delete_from_table(self.USER_TABLE_NAME, "id='1'")
+    #     print(self.__db.select_from_table(self.USER_TABLE_NAME, ["*"]))
+    #     self.__db.drop_table(self.USER_TABLE_NAME)

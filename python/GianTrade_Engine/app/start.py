@@ -225,8 +225,10 @@ api.add_resource(Strategies, '/strategies')
 
 
 if __name__ == "__main__":
-    with open("./private/private.csv") as pfile:
-        data = (pfile.readline()).split(",")
-    
-    master = Master(data[0], data[1])
+    # with open("./private/private.csv") as pfile:
+    #     data = (pfile.readline()).split(",")
+    # master = Master(data[0], data[1])
+
+    master = Master(dbFile="./private/db.db")
+
     app.run(debug=True, port=5000, host='0.0.0.0')

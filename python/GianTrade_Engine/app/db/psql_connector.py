@@ -1,7 +1,7 @@
 # import sqlalchemy as db
 import psycopg2 as p2
 
-class Connector:
+class PSQLConnector:
     def __init__(self):
         self._engine = None
         self._cur = None

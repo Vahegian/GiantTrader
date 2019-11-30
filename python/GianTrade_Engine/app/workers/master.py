@@ -5,16 +5,19 @@ from workers.activity_watcher import ActivityWatch
 from private.strategies.one_m_5_d import OM5D 
 
 class Master:
-    def __init__(self, dbuname, dbpass):
+    def __init__(self, dbuname=None, dbpass=None, dbFile=None):
         self.TAG = "Master >> "
         self.__db_name = "gianttrade"
         self.__host = "docker_db_1"
         self.__port = "5432"
         self.__open_user_accounts = {}
-
-        self.__db = DBManager(self.__db_name, dbuname, dbpass, self.__host, self.__port)
+        if dbFile != None:
+            self.__db = DBManager(db_file=dbFile)
+        else:
+            self.__db = DBManager(self.__db_name, dbuname, dbpass, self.__host, self.__port)
         self.__uManager = UserManager(self.__db)
         self.__actWatch= ActivityWatch(self.__db) 
+
         self.__strategies = {"OM5D":OM5D}
         self.__strategies_user_dict = {}
 

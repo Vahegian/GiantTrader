@@ -1,26 +1,32 @@
-from db.connector import Connector
+from db.psql_connector import PSQLConnector
+from db.sql_lite_connector import SQLLConnector
 from contextlib import contextmanager
 
 class DBManager:
-    def __init__(self, db_name, user, password, host, port='5432'):
-        self._db_name = db_name
-        self._user = user
-        self._pass = password
-        self._host = host
-        self._port = '5432'
-        self._connector = Connector()
+    def __init__(self, db_name=None, user=None, password=None, host=None, port='5432', db_file=None):
+        self.__db_name = db_name
+        self.__user = user
+        self.__pass = password
+        self.__host = host
+        self.__port = port
+        self.__db_file = db_file
 
     @contextmanager
-    def postgdb(self):
+    def db_cur(self):
         try:
-            self._connector.connect(self._db_name, self._user, self._pass,
-                                self._host, self._port)
+            if self.__db_file != None:
+                self.__connector = SQLLConnector()
+                self.__connector.connect(self.__db_file)
+            else:
+                self.__connector = PSQLConnector()
+                self.__connector.connect(self.__db_name, self.__user, self.__pass,
+                                    self.__host, self.__port)
         
-            yield self._connector
+            yield self.__connector
         except Exception as e:
             print(str(e))
         finally:
-            self._connector.disconnect()
+            self.__connector.disconnect()
 
     def create_table(self, tname, col_names, col_types):
         if len(col_names)==len(col_types)>0:
@@ -29,7 +35,7 @@ class DBManager:
                 columns+=citem+" "+vitem+","
             columns = columns[:-1]
             # print(columns)
-            with self.postgdb() as db:
+            with self.db_cur() as db:
                 db.create_table(tname, columns)
 
     def insert_to_table(self, tname, cols_array, values_array):
@@ -42,7 +48,7 @@ class DBManager:
             cols = cols[:-1]
             vals = vals[:-1]+")"
         # print(cols, "\n", vals)
-            with self.postgdb() as db:
+            with self.db_cur() as db:
                 db.insert_into_table(tname, cols, vals)
 
     def select_from_table(self, tname, cols, conds_array=None, order_col=None, dec=False, limit=None):
@@ -56,7 +62,7 @@ class DBManager:
             for item in conds_array:
                 conds+= item+" AND "
             conds = conds[:-5]
-        with self.postgdb() as db:
+        with self.db_cur() as db:
             return db.select_from(tname,colums,conds, order_col, dec, limit)
 
     def update_table(self, tname, cols_array, values_array, cond=None):
@@ -66,20 +72,20 @@ class DBManager:
                 cols += ci+"="+vi+"," 
             cols = cols[:-1]
 
-            with self.postgdb() as db:
+            with self.db_cur() as db:
                 db.update_table(tname, cols, cond)
 
     def delete_from_table(self, tname, cond):
-        with self.postgdb() as db:
+        with self.db_cur() as db:
             db.delete_from(tname, cond)
 
     def drop_table(self, tname):
-        with self.postgdb() as db:
+        with self.db_cur() as db:
             db.drop_table(tname)
 
 if __name__ == "__main__":
     dbm = DBManager("gtbinance","myuser","pass", "docker_db_1")
-    with dbm.postgdb() as db:
+    with dbm.db_cur() as db:
         db.create_table("users", '''id INT PRIMARY KEY NOT NULL,
                                 name TEXT NOT NULL,
                                 enc_pass CHAR(128), 

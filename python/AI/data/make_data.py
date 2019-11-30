@@ -54,7 +54,7 @@ def num_map(x, in_min, in_max, out_min=0, out_max=1):
 
 # all_new_data = np.array()
 
-def get_OHLC_bin_images(data, file_to_save, days=7, dec_days=3): # des_days - decision days to determine if price is up or down
+def get_OHLC_bin_images(data, file_to_save, days=30, dec_days=5): # des_days - decision days to determine if price is up or down
     ohlc_bin_imgs = []
     for market_data in data:
         market_name = market_data[0]
@@ -84,7 +84,7 @@ def get_OHLC_bin_images(data, file_to_save, days=7, dec_days=3): # des_days - de
                     if pre < post:
                         decision = np.array([1, 0],dtype="float32")
                     if save_img:
-                        image = np.reshape(image, (1, 4, 7))
+                        image = np.reshape(image, (1, 4, days))
                         data_sample = np.array([image, decision])
                         ohlc_bin_imgs.append(data_sample)
                         # if len(ohlc_bin_imgs)==0:
