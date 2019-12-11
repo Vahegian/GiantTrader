@@ -71,6 +71,10 @@ class Master:
             return
         self.__open_user_accounts.update({uname.strip(): TradeExec(apiKey.strip(),
                                          apiSecret.strip(), self.__actWatch)})
+    def close_user_account(self, uname):
+        uname = uname.strip()
+        self.__open_user_accounts[uname] = None
+        self.__open_user_accounts.pop(uname)
 
     def add_user(self, uname, password, apiKey, secret):
         self.__uManager.add_user(uname, password, apiKey, secret)

@@ -1,0 +1,17 @@
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+            <div class="card my-5">
+                <div class="card-body">
+                    <h5 class="card-title text-center">LogIn</h5>
+                    <input #login_uname type="text" class="form-control" placeholder="Username" required autofocus>
+                    <br>
+                    <input #login_pass type="password" class="form-control" placeholder="Password" required>
+                    <hr class="my-4">
+                    <button (click)="login_user(login_uname.value, login_pass.value)"
+                        class="btn btn-lg btn-primary">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

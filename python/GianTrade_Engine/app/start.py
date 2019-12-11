@@ -2,11 +2,14 @@ from workers.master import Master
 import time
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
+from flask_cors import CORS
+
 
 master = None
 
 app = Flask(__name__, static_url_path='', 
             static_folder='web')
+CORS(app)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 api = Api(app)
 
@@ -54,6 +57,19 @@ class LogUser(Resource):
             print(udata)
             master.open_user_account(udata[1], udata[3], udata[4])
             return {"message":"user logged in",
+                    "status":1,
+                    "uname":uname}, 201
+
+class LogOutUser(Resource):
+    @wrap_with_try
+    def post(self):
+        args = parser.parse_args()
+        uname = args['uname']
+        if not uname:
+            return {"message":"add user name"}, 400
+        else:
+            master.close_user_account(uname)
+            return {"message":"user logged out",
                     "status":1,
                     "uname":uname}, 201
 
@@ -178,7 +194,8 @@ class GetPairFees(Resource):
         pair = args['pair']
         
         if not uname or not pair:
-            return {"message":"add user name, pair and orderid "}, 400
+            return {"message":"add user name, pair and orderid", 
+                    "status":0}, 400
         else:
             return master.get_user_pair_fee(uname, pair), 201
 
@@ -222,6 +239,7 @@ api.add_resource(SellLimit, '/lsell')
 api.add_resource(CancelOrder, '/ocancel')
 api.add_resource(GetPairFees, '/pairfee')
 api.add_resource(Strategies, '/strategies')
+api.add_resource(LogOutUser, '/outuser')
 
 
 if __name__ == "__main__":

@@ -18,20 +18,20 @@ RUN apt-get update && \
     apt-get install -y tzdata && \
     apt-get install -y python${PYTHON_VERSION} && \
     apt-get install -y python${PYTHON_VERSION}-pip && \
-    apt-get install -y python${PYTHON_VERSION}-opencv && \
     apt-get install -y iputils-ping && \
     apt-get install -y libpq-dev && \
     rm -rf /var/lib/apt/lists/*
 # \Software b1
 
 # Python libs b1
-RUN pip${PYTHON_VERSION} install python-binance && \
-    pip${PYTHON_VERSION} install numpy && \
+RUN pip${PYTHON_VERSION} install numpy && \
     pip${PYTHON_VERSION} install pandas && \
     pip${PYTHON_VERSION} install SQLAlchemy && \
     pip${PYTHON_VERSION} install psycopg2 && \
+    pip${PYTHON_VERSION} install flask-restful && \
     pip${PYTHON_VERSION} install flask_cors && \
-    pip${PYTHON_VERSION} install flask-restful
+    pip${PYTHON_VERSION} install tensorflow==1.13.1 && \
+    pip${PYTHON_VERSION} install keras
 # \Python libs b1
 
 # Running script

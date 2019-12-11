@@ -15,7 +15,8 @@ class Trader:
         self._sec_req_count = 0
         self._min_req_count = 0
         self._day_req_count = 0
-        self.min_amount_allowed_USD=10.0
+        self.__bm = None
+        # self.min_amount_allowed_USD=10.0
 
     def _allow_execut(self, count, limit, now, secs, whatlimit=""):
         execute = False
@@ -130,22 +131,22 @@ class Trader:
     @check_client
     def put_limit_order_buy(self, symbol, quantity, price):
         if symbol!=None and float(quantity) != None and float(price) != None:
-            if quantity*price>self.min_amount_allowed_USD:
-                return self._client.order_limit_buy(symbol=symbol, quantity=quantity, price=price)   
+            # if quantity*price>self.min_amount_allowed_USD:
+            return self._client.order_limit_buy(symbol=symbol, quantity=quantity, price=price)   
 
     @watch_limit
     @check_client
     def put_limit_order_sell(self, symbol, quantity, price):
         if symbol!=None and float(quantity) != None and float(price) != None:
-            if quantity*price>self.min_amount_allowed_USD:
-                return self._client.order_limit_sell(symbol=symbol, quantity=quantity, price=price) 
+            # if quantity*price>self.min_amount_allowed_USD:
+            return self._client.order_limit_sell(symbol=symbol, quantity=quantity, price=price) 
 
     @watch_limit
     @check_client
     def get_live_ticker_update(self, callback):
-        bm = BinanceSocketManager(self._client)
-        bm.start_ticker_socket(callback=callback)
-        bm.start()
+        self.__bm = BinanceSocketManager(self._client)
+        self.__bm.start_ticker_socket(callback=callback)
+        self.__bm.start()
 
     @watch_limit
     @check_client
@@ -162,6 +163,12 @@ class Trader:
                             "volume":item[5]}
             data.update({item_date: item_content})
         return data
+    
+    @check_client
+    def close_account(self):
+        self.__bm.close()
+        self._client = None
+        return True
 
 if __name__ == "__main__":
     bc = Trader()

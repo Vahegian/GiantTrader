@@ -1,10 +1,10 @@
-//const exp = require('express');
-//const server = exp();
+const exp = require('express');
+const server = exp();
 const { app, BrowserWindow, Menu } = require("electron");
 
 
-// server.listen(9999, () => console.log("serving static files on port '9999'"))
-// server.use(exp.static('UI'))
+server.listen(9999, () => console.log("serving static files on port '9999'"))
+server.use(exp.static('web'))
 
 
 
@@ -26,7 +26,7 @@ function boot(){
 		toolbar: false
 	});
 	
-	mainWindow.loadURL('http://0.0.0.0:10001/index.html')
+	mainWindow.loadURL('http://0.0.0.0:9999')
 	// Uncomment to use developer tools
 	mainWindow.webContents.openDevTools({detach:true});
 

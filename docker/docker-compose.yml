@@ -1,5 +1,37 @@
 version: '3.5'
 services:
+  ang:
+    build: ./gian_trade_angular/
+    container_name: docker_ang_1 
+    restart: always
+    volumes:
+      - ../electron/giant-trader-ui:/usr/src/app
+    networks:
+      - backend
+    ports:
+      - "10003:4200"
+#   remove after development
+    command: /bin/sh
+    stdin_open: true
+    tty: true
+#   \remove after developmet
+
+  ai:
+    build: ./gian_trade_ai/
+    container_name: docker_ai_1 
+    restart: always
+    volumes:
+      - ../python/AI:/usr/src/app
+    networks:
+      - backend
+    ports:
+      - "10002:5000"
+#   remove after development
+    command: /bin/sh
+    stdin_open: true
+    tty: true
+#   \remove after developmet
+
   py:
     build: ./gian_trade_engine/
     container_name: docker_py_1 

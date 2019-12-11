@@ -57,3 +57,7 @@ class TradeExec:
                     return item
         else:
             return False
+    
+    def close_account(self):
+        return self.__trader.close_account()
+

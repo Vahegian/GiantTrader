@@ -46,33 +46,10 @@ var live_prices_to_show = ["BTCUSDT", "ETHUSDT", "XRPUSDT", "BNBUSDT", "LTCUSDT"
 function chart_data(data, code) {
     var labels = []
     var dataset = []
-    
-    console.log(data)
-    chart_data = data.chart
-    pred_data = data.pred.preds
-    for (var key in chart_data) {
+    for (var key in data) {
         labels.push(key);
-        dataset.push(parseFloat(chart_data[key].close))
+        dataset.push(parseFloat(data[key].close))
     }
-    console.log(dataset.length+" : "+pred_data.length)
-    var diff = dataset.length-pred_data.length
-    var sides = new Array(diff).fill(0);
-    var sidesbc = new Array(diff).fill("#000000");
-
-    // var sides = []
-    // var sidesbc = []
-    var max_val = Math.max(...dataset)
-    console.log(max_val)
-    for (var index in pred_data){
-        if (pred_data[index].side == "BUY"){
-            sides.push(max_val)
-            sidesbc.push("rgba(255, 0, 0, 0.2)")
-        }else{
-            sides.push(max_val)
-            sidesbc.push("rgba(0, 255, 0, 0.2)")
-        }
-    }
-    console.log(dataset.length+" : "+ sides.length)
     // console.log(labels);
     // console.log(dataset);
     user_chart_canvas_div.innerHTML = `
@@ -80,19 +57,13 @@ function chart_data(data, code) {
     var mChart = document.getElementById('gtchart').getContext('2d');
 
     new Chart(mChart, {
-        type:'bar',
+        type:'line',
         data:{
             labels:labels,
             datasets:[{
                 label:'',
                 data:dataset,
-                backgroundColor: "rgba(0, 0, 255, 0.4)",
-                type: 'line'
-            },{
-                label:'AI',
-                data: sides,
-                backgroundColor:sidesbc
-                
+                backgroundColor: "rgba(0, 255, 0, 0.4)"
             }]
         },
         options:{
