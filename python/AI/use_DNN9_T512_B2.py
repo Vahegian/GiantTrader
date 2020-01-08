@@ -1,5 +1,6 @@
 from models import DNN9_T512_B2
 import numpy as np
+import json
         
 class USE_DNN9_T512_B2:
     def __init__(self):
@@ -7,7 +8,7 @@ class USE_DNN9_T512_B2:
 
     def init_model(self):
         if self.model == None:
-            self.model, _ = DNN9_T512_B2("data/private/model_data/DNN_T512_B2/weights/0-e31-a0.755-l0.499-va0.752-vl0.503.hdf5")
+            self.model, _ = DNN9_T512_B2("data/private/model_data/DNN_T512_B2/weights/1-e01-a0.756-l0.500-va0.752-vl0.503.hdf5")
         else:
             print("Model is Initialized!")
 
@@ -18,6 +19,16 @@ class USE_DNN9_T512_B2:
         if y<0:
             return 0
         return y
+
+    def predict(self, data):
+        preds = []
+        for item in data:
+            # print(item)
+            item = json.loads(item)
+            pred = self.get_model_pred(item)
+            preds.append({"side":pred[0],
+                            "conf": str(pred[1])})
+        return preds
 
     def get_model_pred(self, data):
         """

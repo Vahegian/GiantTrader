@@ -1,47 +1,88 @@
 version: '3.5'
 services:
-  ang:
-    build: ./gian_trade_angular/
-    container_name: docker_ang_1 
+#  rmq:
+#    image: rabbitmq:3-management
+#    #user: $DOCKER_UID:$DOCKER_GID
+#    container_name: docker_rmq_1
+#    restart: always
+#    networks:
+#      all:
+#        ipv4_address: 172.20.0.7
+#    ports:
+#      - "5672:5672"
+#      - "15672:15672"
+
+  bots:
+    image: docker_binance:latest
+    container_name: docker_bots_1
+    #user: 1000:1000 # prevents files from being root
     restart: always
     volumes:
-      - ../electron/giant-trader-ui:/usr/src/app
+      - ../python/Bots:/usr/src/app
     networks:
-      - backend
-    ports:
-      - "10003:4200"
+      all:
+        ipv4_address: 172.20.0.6
+    # ports:
+    #   - "100004:5000"
 #   remove after development
     command: /bin/sh
     stdin_open: true
     tty: true
 #   \remove after developmet
 
+  ang:
+    build: ./gian_trade_angular/
+    container_name: docker_ang_1 
+    #user: 1000:1000
+    restart: always
+    volumes:
+      - ../giant-trader-ui:/usr/src/app
+    networks:
+      all:
+        ipv4_address: 172.20.0.5
+    ports:
+      - "10003:4200"
+    depends_on:
+      - binance
+
+#   remove after development
+    command: /bin/sh
+    stdin_open: true
+    tty: true
+
+#   \remove after developmet
   ai:
     build: ./gian_trade_ai/
     container_name: docker_ai_1 
+    #user: 1000:1000
     restart: always
     volumes:
       - ../python/AI:/usr/src/app
     networks:
-      - backend
-    ports:
-      - "10002:5000"
+      all:
+        ipv4_address: 172.20.0.4
+    # ports:
+    #   - "100002:5000"
+#    depends_on:
+#      - rmq
 #   remove after development
     command: /bin/sh
     stdin_open: true
     tty: true
 #   \remove after developmet
 
-  py:
-    build: ./gian_trade_engine/
-    container_name: docker_py_1 
+  binance:
+    build: ./gian_trade_binance/
+    container_name: docker_binance_1
+    #user: 1000:1000 # prevents files from being root
     restart: always
     volumes:
-      - ../python/GianTrade_Engine/app:/usr/src/app
+      - ../python/binance/app:/usr/src/app
     networks:
-      - backend
-    ports:
-      - "10001:5000"
+      all:
+        ipv4_address: 172.20.0.3
+    # ports:
+    #   - "100001:5000"
 #   remove after development
     command: /bin/sh
     stdin_open: true
@@ -49,9 +90,11 @@ services:
 #   \remove after developmet
     depends_on:
       - db
+#      - rmq
   
   db:
     image: postgres:12.0
+    #user: $DOCKER_UID:$DOCKER_GID
     container_name: docker_db_1
     restart: always
     environment:
@@ -59,12 +102,15 @@ services:
       POSTGRES_USER: myuser
       POSTGRES_DB: db
     volumes:
-      - ./gian_trade_db/data:/var/lib/postgresql/data
+      - ./gian_trade_db/private:/var/lib/postgresql/data
     networks:
-      - backend
-    ports:
-      - "10000:5432"
+      all:
+        ipv4_address: 172.20.0.2
+    # ports:
+    #   - "100000:5432"
 
 networks:
-  backend:
-    name: gian_trade_net
+  all:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24

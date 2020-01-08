@@ -1,7 +1,7 @@
 import numpy as np
 from keras.callbacks import TensorBoard, ModelCheckpoint
 from models import DNN9_T512_B2
-from callbacks import ShowValStats
+import sys
 
 def balance_data(data):
     # balance data
@@ -49,12 +49,22 @@ assert len(val_x)==len(val_y)
 print("\nAFTER \n",val_y)
 
 
-model, EPOCHS = DNN9_T512_B2("data/private/model_data/DNN_T512_B2/weights/0-e31-a0.755-l0.499-va0.752-vl0.503.hdf5", train=True)
-show_val_stats = ShowValStats("data/private/model_data/DNN_T512_B2/train_hist.npy")
+model, EPOCHS = DNN9_T512_B2("data/private/model_data/DNN_T512_B2/weights/1-e01-a0.756-l0.500-va0.752-vl0.503.hdf5", train=True)
+# show_val_stats = ShowValStats("data/private/model_data/DNN_T512_B2/train_hist.npy")
 
 for _ in range(15):
     checkpoint = ModelCheckpoint("data/private/model_data/DNN_T512_B2/weights/"+str(_)+"-e{epoch:02d}-a{acc:.3f}-l{loss:.3f}-va{val_acc:.3f}-vl{val_loss:.3f}.hdf5",
                                 monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+    
+    my_callbacks = [checkpoint]
+
+    if len(sys.argv)>1:
+        if sys.argv[1]=="gui": 
+            from callbacks import ShowValStats
+            show_val_stats = ShowValStats("data/private/model_data/DNN_T512_B2/train_hist.npy")
+            my_callbacks = [show_val_stats, checkpoint]
+        
+
     history = model.fit(train_x, train_y, epochs=EPOCHS, verbose=1, validation_data=(val_x, val_y), 
-                        callbacks=[checkpoint, show_val_stats], batch_size=1024)
+                        callbacks=my_callbacks, batch_size=1024)
 

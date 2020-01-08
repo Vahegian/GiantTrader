@@ -1,0 +1,43 @@
+<div class="row">
+    <div class="col">
+        <div class="card shadow p-3 mb-5 bg-white rounded">
+            <div class="card-body card-body-color">
+                <button (click)="update_show_ai()" class="btn btn-dark">AI Analysis</button>
+                <div *ngIf="show_ai">
+                    <hr>
+                    <div class="row">
+                        <div class="col">
+                            <select [(ngModel)]="selected_model" class="custom-select">
+                                <!-- <option>Select AI Model!</option> -->
+                                <option *ngFor="let model of models" [value]="model">{{model}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col">
+                            <app-ai-chart [model_name]="selected_model"></app-ai-chart>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="card shadow p-3 mb-5 bg-white rounded">
+            <div class="card-body card-body-color">
+                <button (click)="update_show_bots()" class="btn btn-dark">Bots</button>
+                <div *ngIf="show_bots">
+                    <hr>
+                    <div class="row">
+                        <div class="col">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,26 @@
+<div class="card shadow p-3 mb-5 bg-white rounded">
+    <div class="row">
+        <div class="col">
+            <select [(ngModel)]="interval" class="custom-select">
+                <option value="2">2 seconds</option>
+                <option value="6">6 seconds</option>
+            </select>
+        </div>
+        <div class="col">
+            <select [(ngModel)]="max_allowed_points" class="custom-select">
+                <option value="60">60 data points</option>
+                <option value="90">90 data points</option>
+                <option value="180">180 data points</option>
+                <option value="360">360 data points</option>
+            </select>
+        </div>
+        <div class="col">
+            <h6>Max posible window {{(interval*max_allowed_points)/60}} minute(s)!  </h6>
+        </div>
+    </div>
+    <div class="card-body card-body-color">
+        <canvas baseChart [datasets]="mainChartData" [labels]="mainChartLabels" [options]="mainChartOptions"
+            [colors]="mainChartColors" [legend]="mainChartLegend" [chartType]="mainChartType"
+            [plugins]="mainChartPlugins"></canvas>
+    </div>
+</div>

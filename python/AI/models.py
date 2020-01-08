@@ -43,3 +43,51 @@ def DNN9_T512_B2(weights=None, train=False):
     if weights != None:
         model.load_weights(weights)
     return model, EPOCHS
+
+def DNN9_T512_B2_D60r1(weights=None, train=False):
+    LR = 1e-2
+    EPOCHS = 50
+    DECAY = LR/EPOCHS
+    
+    model = Sequential()
+    model.add(Dense(2048, input_dim=240, activation='relu'))
+    model.add(BatchNormalization())
+    if train:
+        model.add(Dropout(0.3))
+    model.add(Dense(1024, activation='relu'))
+    model.add(BatchNormalization())
+    if train:
+        model.add(Dropout(0.3))
+    model.add(Dense(512, activation='relu'))
+    model.add(BatchNormalization())
+    if train:
+        model.add(Dropout(0.3))
+    model.add(Dense(256, activation='relu'))
+    model.add(BatchNormalization())
+    if train:
+        model.add(Dropout(0.3))
+    model.add(Dense(128, activation='relu'))
+    model.add(BatchNormalization())
+    if train:
+        model.add(Dropout(0.2))
+    model.add(Dense(64, activation='relu'))
+    model.add(BatchNormalization())
+    if train:
+        model.add(Dropout(0.1))
+    model.add(Dense(32, activation='relu'))
+    model.add(BatchNormalization())
+    model.add(Dense(16, activation='relu'))
+    model.add(BatchNormalization())
+    model.add(Dense(8, activation='relu'))
+    model.add(BatchNormalization())
+    model.add(Dense(4, activation='relu'))
+    model.add(BatchNormalization())
+    model.add(Dense(2, activation='softmax'))
+
+    optimizer = Adam(lr=LR, decay=DECAY)
+    # optimizer = Adam(lr=LR)
+    model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+    print(model.summary())
+    if weights != None:
+        model.load_weights(weights)
+    return model, EPOCHS

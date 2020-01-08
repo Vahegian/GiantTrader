@@ -1,5 +1,5 @@
 '''
-This script takes one 'npy' file that contains market data 
+This script takes 'npy' file that contains market data 
 of multiple markets and produces a file.
 The file contains 4x7x1 images of the markets (each image holds 7 days of OHLC data)
 and buy or sell signals associated with the images. 
@@ -16,7 +16,7 @@ market_data_file = np.load(market_data_file, allow_pickle=True)
 
 data = np.vstack((coins_data_file, market_data_file))
 
-# randomly shuffle tha data 
+# randomly shuffle the data 
 print(data[0][0])
 np.random.shuffle(data)
 print(data[0][0])
@@ -54,14 +54,14 @@ def num_map(x, in_min, in_max, out_min=0, out_max=1):
 
 # all_new_data = np.array()
 
-def get_OHLC_bin_images(data, file_to_save, days=30, dec_days=5): # des_days - decision days to determine if price is up or down
+def get_OHLC_bin_images(data, file_to_save, days=60, dec_days=1): # des_days - decision days to determine if price is up or down
     ohlc_bin_imgs = []
     for market_data in data:
         market_name = market_data[0]
         if market_name=="tether" or market_name=="^N225":
             continue
-        print(os.getpid(), f"working on {market_data[0]}")
-        market_data = market_data[1] # get dataframe [0] will be tha market name
+        print(os.getpid(), f"working on {market_name}")
+        market_data = market_data[1] # get dataframe, [0] will be tha market name
         low, ope_n, close, high = market_data["Low"], market_data["Open"], market_data["Close"], market_data["High"] # OHLC datasets
         for i in range(len(low)):
             max_of_the_market = market_data["High"][i:i+days].max() # get max value of the given range

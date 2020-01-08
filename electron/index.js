@@ -26,7 +26,7 @@ function boot(){
 		toolbar: false
 	});
 	
-	mainWindow.loadURL('http://0.0.0.0:9999')
+	mainWindow.loadURL('http://0.0.0.0:10003')
 	// Uncomment to use developer tools
 	mainWindow.webContents.openDevTools({detach:true});
 
