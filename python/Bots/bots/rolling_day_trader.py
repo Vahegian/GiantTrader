@@ -17,13 +17,15 @@ class RollingDayTrader(BOT):
         self.__price_bought = 0.0
         self.__bought_time = None
         self.__amount_bought = 0.0
-        self.__add_log_at_date_time(f"Init {self.__TAG} with user {user} for pair {pair}")
+        self.__add_log_at_date_time(f"Init {self.__TAG} with {minUSDT}, {wantedProfitPercent}, {maxAcceptableLossPercent}")
         self.__min_USDT = float(minUSDT)
         self.__profit_percent = float(wantedProfitPercent)
         self.__loss_percent = float(maxAcceptableLossPercent)
         self.__update_interval_sec = int(updateSec)
         self.__seconds_to_wait_after_sell = 60
-        self.__maxFee = 0.1 # %
+        self.__maxFee = 0.2 # %
+        self.__current_amount_usd = 0.0
+        self.__profit_last_trade = 0.0
 
     def start(self):
         try:
@@ -47,13 +49,14 @@ class RollingDayTrader(BOT):
         ls = self.__price_bought-((self.__loss_percent/100)*self.__price_bought) #loss sell price
         ps = self.__price_bought+((self.__profit_percent/100)*self.__price_bought)
         return {"bot":self.__TAG, "pair":self.__pair, "minUSDT":f"{self.__min_USDT:.6f}", "profitPercent":self.__profit_percent, "lossPercent":self.__loss_percent,
-                "updateInterval":self.__update_interval_sec, "amountBought":f"{self.__amount_bought:.6f}", "priceBought":f"{self.__price_bought:.6f}", "lsps":f"{ls:.6f}/{ps:.6f}"}
+                "updateInterval":self.__update_interval_sec, "amountBought":f"{self.__amount_bought:.6f}", "priceBought":f"{self.__price_bought:.6f}", "lsps":f"{ls:.6f}/{ps:.6f}",
+                "lt_profit": f"{self.__profit_last_trade:.6f}", "lt_profit_p":f"{self.__getProfit():.2f}", "total_usdt": f"{self.__current_amount_usd:.6f}"}
 
-    def set_bot_params(self, minUSDT=11.0, wantedProfitPercent=5.0, maxAcceptableLossPercent=5.0, updateSec=10):
-        self.__min_USDT = float(minUSDT)
-        self.__profit_percent = float(wantedProfitPercent)
-        self.__loss_percent = float(maxAcceptableLossPercent)
-        self.__update_interval_sec = int(updateSec)
+    def __getProfit(self):
+        if (self.__amount_bought*self.__price_bought) > 0.0:
+            return self.__profit_last_trade/(self.__amount_bought*self.__price_bought)
+        else:
+            return 0.0
 
     def __start_thrading(self):
         with self.__bot_thread_lock:
@@ -77,6 +80,7 @@ class RollingDayTrader(BOT):
                 else:
                     self.__sell_percent_loss(price)
                 self.__close_position_if_new_day(price)
+            self.__current_amount_usd = price*self.__amount_bought
 
     def __check_resource_availability(self):
         self.__add_log_at_date_time("Trying to get balance")
@@ -130,6 +134,7 @@ class RollingDayTrader(BOT):
             if success:
                 self.__add_log_at_date_time(f"Sold {sellable_amount} {self.__pair} at {price} on {self.__get_cur_time()}, percent_diff {percent_diff}%")
                 time.sleep(self.__seconds_to_wait_after_sell)
+                self.__profit_last_trade =(price*self.__amount_bought) - (self.__amount_bought*self.__price_bought)
                 self.__amount_bought = 0
 
     def __close_position_if_new_day(self, curPrice):
@@ -142,22 +147,24 @@ class RollingDayTrader(BOT):
         else:
             self.__add_log_at_date_time(f"next day {self.__bought_time.day < curTime.day} !")
 
-        if  self.__bought_time.hour < curTime.hour and self.__bought_time.minute < curTime.minute:
+        if  self.__bought_time.hour <= curTime.hour and self.__bought_time.minute <= curTime.minute:
             isPassBoughtTime = True 
             self.__add_log_at_date_time(f"It is pass buy time!")
         else:
-            self.__add_log_at_date_time(f"buy hour { self.__bought_time.hour < curTime.hour} | buy minute {self.__bought_time.minute < curTime.minute}!")
+            self.__add_log_at_date_time(f"pass bought hour = { self.__bought_time.hour < curTime.hour} | pass bought minute = {self.__bought_time.minute < curTime.minute}!")
 
         self.__add_log_at_date_time(f"Current time {curTime} time of purchase {self.__bought_time}") 
         if isNextDay and isPassBoughtTime:
-            percent_diff = self.__get_percent_diff_from_bought_price(curPrice)
-            self.__add_log_at_date_time(f"closing the day at price {curPrice} and percent difference is {percent_diff}")
-            sellable_amount = self.__amount_bought - ((self.__maxFee/100) * self.__amount_bought)
-            success, price = self.__binance.sell_market(self.__pair, f"{sellable_amount:.6f}")
-            if success:
-                self.__add_log_at_date_time(f"Sold {sellable_amount} {self.__pair} at {price} on {self.__get_cur_time()}, percent_diff {percent_diff}%")
-                time.sleep(self.__seconds_to_wait_after_sell)
-                self.__amount_bought = 0
+            self.__add_log_at_date_time(f"Selling now because it is the next day") 
+            self.__sell_at_percent_diff(curPrice, 0.0)
+            # percent_diff = self.__get_percent_diff_from_bought_price(curPrice)
+            # self.__add_log_at_date_time(f"closing the day at price {curPrice} and percent difference is {percent_diff}")
+            # sellable_amount = self.__amount_bought - ((self.__maxFee/100) * self.__amount_bought)
+            # success, price = self.__binance.sell_market(self.__pair, f"{sellable_amount:.6f}")
+            # if success:
+            #     self.__add_log_at_date_time(f"Sold {sellable_amount} {self.__pair} at {price} on {self.__get_cur_time()}, percent_diff {percent_diff}%")
+            #     time.sleep(self.__seconds_to_wait_after_sell)
+            #     self.__amount_bought = 0
 
 
     def __add_log_at_date_time(self, msg):
