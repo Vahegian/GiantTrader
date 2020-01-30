@@ -8,7 +8,7 @@ class USE_DNN9_T512_B2:
 
     def init_model(self):
         if self.model == None:
-            self.model, _ = DNN9_T512_B2("data/private/model_data/DNN_T512_B2/weights/1-e01-a0.756-l0.500-va0.752-vl0.503.hdf5")
+            self.model, _ = DNN9_T512_B2("DNN_T512_B2/weights/1-e01-a0.756-l0.500-va0.752-vl0.503.hdf5")
         else:
             print("Model is Initialized!")
 
@@ -49,7 +49,7 @@ class USE_DNN9_T512_B2:
             return "SELL", pred[0][1]
 
     def run_test(self):
-        test_data = np.load("data/private/model_data/DNN_T512_B2/test.npy", allow_pickle=True)
+        test_data = np.load("DNN_T512_B2/test.npy", allow_pickle=True)
         correct, wrong, total = 0, 0, 0
         for item in test_data:
             item[0] = np.reshape(item[0], (1, 120))

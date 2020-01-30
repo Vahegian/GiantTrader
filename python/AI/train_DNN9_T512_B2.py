@@ -23,8 +23,8 @@ def balance_data(data):
     print("first img after shuffle \n",data[0])
     return data
     
-_TRAIN_FILE = "data/private/model_data/DNN_T512_B2/train.npy"
-_VAL_FILE = "data/private/model_data/DNN_T512_B2/val.npy"
+_TRAIN_FILE = "DNN_T512_B2/private/train.npy"
+_VAL_FILE = "DNN_T512_B2/private/val.npy"
 
 _TRAIN_FILE = np.load(_TRAIN_FILE, allow_pickle=True)
 _VAL_FILE = np.load(_VAL_FILE, allow_pickle=True)
@@ -49,11 +49,11 @@ assert len(val_x)==len(val_y)
 print("\nAFTER \n",val_y)
 
 
-model, EPOCHS = DNN9_T512_B2("data/private/model_data/DNN_T512_B2/weights/1-e01-a0.756-l0.500-va0.752-vl0.503.hdf5", train=True)
+model, EPOCHS = DNN9_T512_B2("DNN_T512_B2/weights/1-e01-a0.756-l0.500-va0.752-vl0.503.hdf5", train=True)
 # show_val_stats = ShowValStats("data/private/model_data/DNN_T512_B2/train_hist.npy")
 
 for _ in range(15):
-    checkpoint = ModelCheckpoint("data/private/model_data/DNN_T512_B2/weights/"+str(_)+"-e{epoch:02d}-a{acc:.3f}-l{loss:.3f}-va{val_acc:.3f}-vl{val_loss:.3f}.hdf5",
+    checkpoint = ModelCheckpoint("DNN_T512_B2/weights/"+str(_)+"-e{epoch:02d}-a{acc:.3f}-l{loss:.3f}-va{val_acc:.3f}-vl{val_loss:.3f}.hdf5",
                                 monitor='val_acc', verbose=1, save_best_only=True, mode='max')
     
     my_callbacks = [checkpoint]
@@ -61,7 +61,7 @@ for _ in range(15):
     if len(sys.argv)>1:
         if sys.argv[1]=="gui": 
             from callbacks import ShowValStats
-            show_val_stats = ShowValStats("data/private/model_data/DNN_T512_B2/train_hist.npy")
+            show_val_stats = ShowValStats("DNN_T512_B2/private/train_hist.npy")
             my_callbacks = [show_val_stats, checkpoint]
         
 
