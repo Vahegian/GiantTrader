@@ -16,6 +16,8 @@ class TradeExec:
         # self.__openOrders = []
         self.__prices = {}
         self.start_price_tickers()
+        # self.__trader.market_buy("XRPUSDT", 10)
+        # exit(0)
 
 
     def update_wallet(self):
@@ -29,14 +31,20 @@ class TradeExec:
         return self.__openOrders
 
     def buy_limit(self, pair, amount, price):
-        self.__trader.put_limit_order_buy(pair, amount, price)
-            
+        return self.__trader.put_limit_order_buy(pair, amount, price)
+       
     def sell_limit(self, pair, amount, price):
-        self.__trader.put_limit_order_sell(pair, amount, price)
+        return self.__trader.put_limit_order_sell(pair, amount, price)
+        
+    def buy_market(self, pair, amount):
+        return self.__trader.market_buy(pair, amount)
+
+    def sell_market(self, pair, amount):
+        return self.__trader.market_sell(pair, amount)
 
     def cancel_order(self, pair, orderId):
-        self.__trader.cancel_order(pair, orderId)
-    
+        return self.__trader.cancel_order(pair, orderId)
+
     def start_price_tickers(self):
         self.__trader.get_live_ticker_update(self.__update_prices)
 

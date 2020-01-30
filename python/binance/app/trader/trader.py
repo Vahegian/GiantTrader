@@ -170,6 +170,20 @@ class Trader:
         self._client = None
         return True
 
+    @watch_limit
+    @check_client
+    def market_sell(self, symbol, quantity):
+        if symbol!=None and float(quantity) != None:
+            # if quantity*price>self.min_amount_allowed_USD: 
+            return self._client.order_market_sell(symbol=symbol, quantity=quantity)
+    
+    @watch_limit
+    @check_client
+    def market_buy(self, symbol, quantity):
+        if symbol!=None and float(quantity) != None:
+            # if quantity*price>self.min_amount_allowed_USD: 
+            return self._client.order_market_buy(symbol=symbol, quantity=quantity) 
+
 if __name__ == "__main__":
     bc = Trader()
     # Create client which will send requests to exchange, default values will not enable trading.

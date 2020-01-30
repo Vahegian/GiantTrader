@@ -1,23 +1,48 @@
 <div class="card shadow p-3 mb-5 bg-white rounded">
     <div class="card-body card-body-color">
-        <h4 class="card-title">Limit orders</h4>
+        <h4 *ngIf="!isMarket" class="card-title">Limit orders</h4>
+        <h4 *ngIf="isMarket" class="card-title">Market orders</h4>
+        <h6>max accuracy must be less than 7</h6>
         <div class="row">
             <div class="col">
                 <h6> Working Pair: {{engine_api.working_pair}}</h6><br>
-                <input #price type="number" class="form-control" placeholder="Price"><br>
-                <input #amount type="number" class="form-control" placeholder="Amount"><br>
+                <div *ngIf="!isMarket">
+                    <input [(ngModel)]="price" type="number" class="form-control" placeholder="Price"><br>
+                </div>
+                <input [(ngModel)]="amount" type="number" class="form-control" placeholder="Amount"><br>
                 <div class="row">
                     <div class="col">
-                        <div role="group" class="btn-group">
-                            <button (click)="select_side()" [class]="side[1]" type="button">Sell</button>
-                            <button (click)="select_side()" [class]="side[2]" type="button">Buy</button>
+                        <div class="row">
+                            <div class="col">
+                                <div role="group" class="btn-group">
+                                    <button (click)="select_side()" [class]="side[1]" type="button">Sell</button>
+                                    <button (click)="select_side()" [class]="side[2]" type="button">Buy</button>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div *ngIf="isMarket" role="group" class="btn-group">
+                                    <button (click)="isMarket=false;" class="btn" type="button">Limit</button>
+                                    <button (click)="isMarket=true;" class="btn btn-secondary"
+                                        type="button">Market</button>
+                                </div>
+                                <div *ngIf="!isMarket" role="group" class="btn-group">
+                                    <button (click)="isMarket=false" class="btn btn-secondary"
+                                        type="button">Limit</button>
+                                    <button (click)="isMarket=true" class="btn btn" type="button">Market</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
                     <div class="row">
-                    <div class="col">
-                        <button (click)="place_order(price.value, amount.value)" class="btn btn-primary" type="button">Place Order</button>
+                        <div class="col">
+                            <!-- <h6> values: {{price}} {{amount}}</h6> -->
+                            <button *ngIf="!isMarket" (click)="place_limit_order(price, amount)"
+                                class="btn btn-primary" type="button">Place Limit Order</button>
+                            <button *ngIf="isMarket" (click)="place_market_order(amount)" class="btn btn-primary"
+                                type="button">Place Market Order</button>
+                        </div>
                     </div>
-                </div>
                 </div>
             </div>
         </div>

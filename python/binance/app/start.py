@@ -34,7 +34,7 @@ def wrap_with_try(func):
             return func(*args, **kwargs)
         except Exception as e:
             print(str(e))
-            return {"message": str(e)}, 400
+            return {"message": str(e), "status":0}, 201
     return inner
 
 class LogUser(Resource):
@@ -51,7 +51,7 @@ class LogUser(Resource):
         uname = args['uname']
         upass = args['upass']
         if not uname or not upass:
-            return {"message":"add user name and password"}, 400
+            return {"message":"add user name and password", "status":0}, 400
         else:
             udata = master.get_user_data(uname, upass)
             print(udata)
@@ -147,9 +147,28 @@ class BuyLimit(Resource):
         if not uname or not pair or not amount or not price:
             return {"message":"add user name, pair, amount, fee and price "}, 400
         else:
-            master.buy_lim_user(uname,pair,float(amount),float(price), fee)
-            return {"message": f"Buy order for {pair} is placed", 
-                    "status":1}, 201
+            if master.buy_lim_user(uname,pair,float(amount),float(price), fee):
+                return {"message": f"Buy order for {pair} is placed", 
+                        "status":1}, 201
+            return {"status":0}, 201
+
+class BuyMarket(Resource):
+    @wrap_with_try
+    def post(self):
+        args = parser.parse_args()
+        uname = args['uname']
+        pair = args['pair']
+        amount = args['amount']
+        fee = args['fee']
+
+        if not uname or not pair or not amount:
+            return {"message":"add user name, pair, amount, fee and price "}, 400
+        else:
+            done, price = master.buy_user(uname,pair,float(amount), fee)
+            if done:
+                return {"message": f"Buy order for {pair} is placed", 
+                        "status":1, "price":price}, 201
+            return {"status":0}, 201
 
 class SellLimit(Resource):
     @wrap_with_try
@@ -163,9 +182,27 @@ class SellLimit(Resource):
         if not uname or not pair or not amount or not price:
             return {"message":"add user name, pair, amount, fee and price "}, 400
         else:
-            master.sell_lim_user(uname,pair,float(amount),float(price), fee)
-            return {"message": f"Sell order for {pair} is placed", 
-                    "status":1}, 201
+            if master.sell_lim_user(uname,pair,float(amount),float(price), fee):
+                return {"message": f"Sell order for {pair} is placed", 
+                        "status":1}, 201
+            return {"status":0}, 201
+
+class SellMarket(Resource):
+    @wrap_with_try
+    def post(self):
+        args = parser.parse_args()
+        uname = args['uname']
+        pair = args['pair']
+        amount = args['amount']
+        fee = args['fee']
+        if not uname or not pair or not amount:
+            return {"message":"add user name, pair, amount, fee and price "}, 400
+        else:
+            done, price = master.sell_user(uname,pair,float(amount), fee)
+            if done:
+                return {"message": f"Sell order for {pair} is placed", 
+                        "status":1, "price":price}, 201
+            return {"status":0}, 201
 
 class CancelOrder(Resource):
     @wrap_with_try
@@ -181,11 +218,11 @@ class CancelOrder(Resource):
         if not uname or not pair or not orderid or not amount or not price:
             return {"message":"add user name, pair, amount, price, fee and orderid "}, 400
         else:
-            master.cancel_user_order(uname, pair, orderid, amount, price, fee)
-            return {"message": f"Cancelled order for {pair}", 
-                    "status":1,
-                    "orderID":orderid}, 201
-
+            if master.cancel_user_order(uname, pair, orderid, amount, price, fee):
+                return {"message": f"Cancelled order for {pair}", 
+                        "status":1,
+                        "orderID":orderid}, 201
+            return {"status":0}, 201
 class GetPairFees(Resource):
     @wrap_with_try
     def post(self):
@@ -208,6 +245,8 @@ api.add_resource(GetLprices, '/lastprices')
 api.add_resource(GetOHLCV, '/ohlcv')
 api.add_resource(BuyLimit, '/lbuy')
 api.add_resource(SellLimit, '/lsell')
+api.add_resource(BuyMarket, '/mbuy')
+api.add_resource(SellMarket, '/msell')
 api.add_resource(CancelOrder, '/ocancel')
 api.add_resource(GetPairFees, '/pairfee')
 api.add_resource(LogOutUser, '/outuser')

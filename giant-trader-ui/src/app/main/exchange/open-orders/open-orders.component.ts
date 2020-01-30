@@ -9,7 +9,9 @@ import { BinanceApiService } from 'src/app/services/binance/binance-api.service'
 export class OpenOrdersComponent implements OnInit {
   public open_order_rows = [];
   public update_progress = 0;
+  public accuracy = 6;
   constructor(private engine_api: BinanceApiService) { }
+  
 
   ngOnInit() {
     this.update_open_orders()
@@ -34,10 +36,10 @@ export class OpenOrdersComponent implements OnInit {
       for (var i in data){
         this.open_order_rows.push([data[i]["orderId"], data[i]["symbol"],
                                    data[i]["side"], data[i]["type"], 
-                                   parseFloat(data[i]["price"]).toFixed(4),
-                                   parseFloat(data[i]["origQty"]).toFixed(4),
-                                   parseFloat(data[i]["executedQty"]).toFixed(4), 
-                                   parseFloat(data[i]["stopPrice"]).toFixed(4),
+                                   parseFloat(data[i]["price"]).toFixed(this.accuracy),
+                                   parseFloat(data[i]["origQty"]).toFixed(this.accuracy),
+                                   parseFloat(data[i]["executedQty"]).toFixed(this.accuracy), 
+                                   parseFloat(data[i]["stopPrice"]).toFixed(this.accuracy),
                                    data[i]["fee"]])
       }
     });

@@ -13,6 +13,7 @@ export class AI {
 
   private urls = {
     server : "http://172.20.0.4:5000",
+    // server : "/ai",
     dnn_batch_pred_url : "/getnnbatchpred",
     get_models_url: "/getmodels"
   }

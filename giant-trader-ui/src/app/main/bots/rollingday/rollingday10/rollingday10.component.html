@@ -1,0 +1,92 @@
+<div class="card shadow p-3 mb-5 bg-white rounded">
+    <div class="card-body card-body-color">
+        <h4 class="card-title">RollingDay</h4>
+        <div class="row">
+            <div class="col">
+                <select [(ngModel)]="selected_bot" name="bot">
+                    <option *ngFor="let bot of bots" [value]="bot">{{bot}}</option>
+                </select>
+            </div>
+            <div class="col">
+                <button (click)="add_bot(selected_bot)" class="btn btn-primary">Add bot</button>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                    <table class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Bot</th>
+                                <th>Pair</th>
+                                <th>minUSDT</th>
+                                <th>amountBought</th>
+                                <th>priceBought</th>
+                                <th>profit%</th>
+                                <th>loss%</th>
+                                <th>Ls/Ps</th>
+                                <th>log</th>
+                                <th><button (click)="update()"
+                                        class="btn btn-outline-primary btn-sm">
+                                        <div *ngIf="!show_removing">
+                                            Update
+                                        </div>
+                                        <div *ngIf="show_removing">
+                                            <div class="spinner-grow text-info" role="status">
+                                                <span class="sr-only">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of running_bots">
+                                <td>{{item[0]}}</td>
+                                <td>{{item[1].bot}}</td>
+                                <td>{{item[1].pair}}</td>
+                                <td>{{item[1].minUSDT}}</td>
+                                <td>{{item[1].amountBought}}</td>
+                                <td>{{item[1].priceBought}}</td>
+                                <td>{{item[1].profitPercent}}</td>
+                                <td>{{item[1].lossPercent}}</td>
+                                <td>{{item[1].lsps}}</td>
+                                <td><button (click)="show_bot_log(item[0])"
+                                    class="btn btn-danger btn-sm">Show Log</button>
+                                </td>
+                                <td>
+                                    <button (click)="remove_bot(item[0])"
+                                        class="btn btn-danger btn-sm">
+                                        Remove
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col">
+                <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                    <table class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Log {{logging_bot_id}} </th>
+                                <th>Bot info</th>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let b_log of bot_log">
+                                <td>{{b_log[0]}}</td>
+                                <td class="text-success" >{{b_log[1][0]}}</td>
+                                <td>{{b_log[1][1]}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

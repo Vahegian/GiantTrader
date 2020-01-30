@@ -18,8 +18,9 @@ import { ChartComponent } from './main/exchange/chart/chart.component';
 import { ChartsModule } from 'ng2-charts';
 import { AIChartComponent } from './main/bots/ai-chart/ai-chart.component';
 import { AI } from './services/ai/ai.service';
-import { Bots } from './services/bots/bots.service';
+import { RollingDayBot } from './services/bots/bots.service';
 import { ChartLiveComponent } from './main/exchange/chart-live/chart-live.component';
+import { Rollingday10Component } from './main/bots/rollingday/rollingday10/rollingday10.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -34,6 +35,7 @@ import { ChartLiveComponent } from './main/exchange/chart-live/chart-live.compon
     ChartComponent,
     AIChartComponent,
     ChartLiveComponent,
+    Rollingday10Component,
   ],
   imports: [
     BrowserModule,
@@ -42,7 +44,7 @@ import { ChartLiveComponent } from './main/exchange/chart-live/chart-live.compon
     FormsModule,
     ChartsModule
   ],
-  providers: [BinanceApiService, AI, Bots],
+  providers: [BinanceApiService, AI, RollingDayBot],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

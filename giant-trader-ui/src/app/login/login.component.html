@@ -9,7 +9,13 @@
                     <input #login_pass type="password" class="form-control" placeholder="Password" required>
                     <hr class="my-4">
                     <button (click)="login_user(login_uname.value, login_pass.value)"
-                        class="btn btn-lg btn-primary">Login</button>
+                        class="btn btn-lg btn-primary">Login
+                        <div *ngIf="show_loggingin">
+                            <div class="spinner-grow text-info" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    </button>
                 </div>
             </div>
         </div>

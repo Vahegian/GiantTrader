@@ -10,6 +10,7 @@ export class WalletComponent implements OnInit {
   public wallet_content = [];
   public wallet_total = 0.0;
   public update_progress = 0;
+  public accuracy = 6;
   constructor(private engine_api: BinanceApiService) { }
 
   ngOnInit() {
@@ -41,8 +42,8 @@ export class WalletComponent implements OnInit {
               var total = this.get_total_price_of_asset(item,
                 free, locked, lprices);
               this.wallet_total += total;
-              this.wallet_content.push([item, free.toFixed(4),
-                locked.toFixed(4), total.toFixed(4)])
+              this.wallet_content.push([item, free.toFixed(this.accuracy),
+                locked.toFixed(4), total.toFixed(this.accuracy)])
             }
           });
       });

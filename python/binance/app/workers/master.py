@@ -57,22 +57,65 @@ class Master:
         return self.__open_user_accounts[uname].get_ohlcv(pair, for_num_of_days-1)
 
     def buy_lim_user(self, uname, pair, amount, price, fee=0.1):
-        with self.__actWatch.record() as rec:
-            self.__open_user_accounts[uname].buy_limit(pair, amount, price)
-            rec.update({"uname":uname, "action":"BUY", "pair":pair, 
-                        "amount":amount, "price":price, "fee":fee})
+        resp = self.__open_user_accounts[uname].buy_limit(pair, amount, price)
+        print(self.TAG, "buy lim user" ,resp, resp['symbol'],pair,resp['status'], "NEW", resp['price'])
+        if pair==resp['symbol'] and resp['status']=="NEW":
+            with self.__actWatch.record() as rec:
+                rec.update({"uname":uname, "action":"BUY", "pair":resp['symbol'], 
+                        "amount":resp['origQty'], "price":resp['price'], "fee":fee})
+            return True
+        return False
 
     def sell_lim_user(self, uname, pair, amount, price, fee=0.1):
-        with self.__actWatch.record() as rec:
-            self.__open_user_accounts[uname].sell_limit(pair, amount, price)
-            rec.update({"uname":uname, "action":"SELL", "pair":pair, 
-                        "amount":amount, "price":price, "fee":fee})
+        resp = self.__open_user_accounts[uname].sell_limit(pair, amount, price)
+        print(self.TAG, "sell lim user" ,resp, resp['symbol'],pair,resp['status'], "NEW", resp['price'])
+        if pair==resp['symbol'] and resp['status']=="NEW":
+            with self.__actWatch.record() as rec:
+                rec.update({"uname":uname, "action":"SELL", "pair":resp['symbol'], 
+                        "amount":resp['origQty'], "price":resp['price'], "fee":fee})
+            return True
+        return False
+
+    def buy_user(self, uname, pair, amount, fee=0.1):
+        resp = self.__open_user_accounts[uname].buy_market(pair, amount)
+        print(self.TAG, "buy user" ,resp, resp['symbol'],pair,resp['status'], "FILLED", resp['price'])
+        if pair==resp['symbol'] and resp['status']=="FILLED":
+            price = 0.0
+            for item in resp['fills']:
+                temp_price = float(item['price'])
+                if temp_price>price:
+                    price = temp_price
+            with self.__actWatch.record() as rec:
+                rec.update({"uname":uname, "action":"BUY", "pair":resp['symbol'], 
+                        "amount":resp['origQty'], "price":resp['price'], "fee":fee})
+            return True, price
+        return False, 0
+
+    def sell_user(self, uname, pair, amount, fee=0.1):
+        resp = self.__open_user_accounts[uname].sell_market(pair, amount)
+        print(self.TAG, "sell user" ,resp, resp['symbol'],pair,resp['status'], "FILLED", resp['price'])
+        if pair==resp['symbol'] and resp['status']=="FILLED":
+            price = 0.0
+            for item in resp['fills']:
+                temp_price = float(item['price'])
+                if temp_price>price:
+                    price = temp_price
+            with self.__actWatch.record() as rec:
+                rec.update({"uname":uname, "action":"SELL", "pair":resp['symbol'], 
+                        "amount":resp['origQty'], "price":resp['price'], "fee":fee})
+            return True, price
+        return False, 0
 
     def cancel_user_order(self, uname, pair, orderId, amount, price, fee=0.1):
-        with self.__actWatch.record() as rec:
-            self.__open_user_accounts[uname].cancel_order(pair, orderId)
-            rec.update({"uname":uname, "action":"CANCEL", "pair":pair, 
-                        "amount":amount, "price":price, "fee":fee})
+        resp = self.__open_user_accounts[uname].cancel_order(pair, orderId)
+        print(resp)
+        if int(orderId)==int(resp['orderId']) and resp["status"]=="CANCELED":
+            with self.__actWatch.record() as rec:
+                rec.update({"uname":uname, "action":"CANCEL", "pair":resp['symbol'], 
+                        "amount":resp['origQty'], "price":resp['price'], "fee":fee})
+            return True
+        return False
+
     def get_user_pair_fee(self, uname, pair):
         return self.__open_user_accounts[uname].get_pair_fees(pair)
     

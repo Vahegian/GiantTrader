@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OM5DComponent } from './om5-d.component';
+import { Rollingday10Component } from './rollingday10.component';
 
-describe('OM5DComponent', () => {
-  let component: OM5DComponent;
-  let fixture: ComponentFixture<OM5DComponent>;
+describe('Rollingday10Component', () => {
+  let component: Rollingday10Component;
+  let fixture: ComponentFixture<Rollingday10Component>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ OM5DComponent ]
+      declarations: [ Rollingday10Component ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OM5DComponent);
+    fixture = TestBed.createComponent(Rollingday10Component);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
