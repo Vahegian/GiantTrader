@@ -24,9 +24,11 @@
                                 <th>minUSDT</th>
                                 <th>amountBought</th>
                                 <th>priceBought</th>
-                                <th>profit%</th>
-                                <th>loss%</th>
+                                <th>profit</th>
+                                <th>loss</th>
                                 <th>Ls/Ps</th>
+                                <th>Profit</th>
+                                <th>Total</th>
                                 <th>log</th>
                                 <th><button (click)="update()"
                                         class="btn btn-outline-primary btn-sm">
@@ -50,9 +52,11 @@
                                 <td>{{item[1].minUSDT}}</td>
                                 <td>{{item[1].amountBought}}</td>
                                 <td>{{item[1].priceBought}}</td>
-                                <td>{{item[1].profitPercent}}</td>
-                                <td>{{item[1].lossPercent}}</td>
+                                <td>{{item[1].profitPercent}}%</td>
+                                <td>{{item[1].lossPercent}}%</td>
                                 <td>{{item[1].lsps}}</td>
+                                <td>{{item[1].lt_profit_p}}%</td>
+                                <td>${{item[1].total_usdt}}</td>
                                 <td><button (click)="show_bot_log(item[0])"
                                     class="btn btn-danger btn-sm">Show Log</button>
                                 </td>

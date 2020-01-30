@@ -24,6 +24,8 @@ export class Rollingday10Component implements OnInit {
         this.bots.push(data[i]);
       }
     })
+    this.update();
+    setInterval(()=>{this.update()}, 10000);
   }
 
   update(){
