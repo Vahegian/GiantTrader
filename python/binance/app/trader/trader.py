@@ -5,6 +5,7 @@ from datetime import date, timedelta
 
 class Trader:
     def __init__(self):
+        self.__TAG = "BinanceTrader >> "
         self.default_Key="api_key"
         self.default_Secret="api_secret"
         self._client = None
@@ -21,7 +22,7 @@ class Trader:
     def _allow_execut(self, count, limit, now, secs, whatlimit=""):
         execute = False
         if self._last_req_time==None:
-                 self._last_req_time=now
+            self._last_req_time=now
         if count<limit:
             count+=1
             execute=True
@@ -148,6 +149,10 @@ class Trader:
         self.__bm.start_ticker_socket(callback=callback)
         self.__bm.start()
 
+    def stop_BinanceSocket(self):
+        self.__bm.close()
+        print(self.__TAG, "Binance socket stopped!")
+
     @watch_limit
     @check_client
     def get_hist_data_day_interval(self, symbol, numofdays):
@@ -166,7 +171,7 @@ class Trader:
     
     @check_client
     def close_account(self):
-        self.__bm.close()
+        self.stop_BinanceSocket()
         self._client = None
         return True
 
