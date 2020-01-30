@@ -22,7 +22,7 @@ class RollingDayTrader(BOT):
         self.__profit_percent = float(wantedProfitPercent)
         self.__loss_percent = float(maxAcceptableLossPercent)
         self.__update_interval_sec = int(updateSec)
-        self.__seconds_to_wait_after_sell = 60
+        self.__seconds_to_wait_after_sell = int(2.5*60)
         self.__maxFee = 0.2 # %
         self.__current_amount_usd = 0.0
         self.__profit_last_trade = 0.0
@@ -133,9 +133,11 @@ class RollingDayTrader(BOT):
             print(self.__TAG, "sell percent", success, price, curPrice, percent, percent_diff)
             if success:
                 self.__add_log_at_date_time(f"Sold {sellable_amount} {self.__pair} at {price} on {self.__get_cur_time()}, percent_diff {percent_diff}%")
-                time.sleep(self.__seconds_to_wait_after_sell)
+                self.__add_log_at_date_time(f"waiting {self.__seconds_to_wait_after_sell} seconds")
                 self.__profit_last_trade =(price*self.__amount_bought) - (self.__amount_bought*self.__price_bought)
+                time.sleep(self.__seconds_to_wait_after_sell)
                 self.__amount_bought = 0
+                
 
     def __close_position_if_new_day(self, curPrice):
         self.__add_log_at_date_time(f"Trying to close the position for {self.__pair} at price {curPrice} if it is the next day")  
