@@ -9,6 +9,8 @@ class BOT:
     def add_log(self, data):
         if len(self.__log) > 200:
             self.__log.pop(0)
+        if self.__log_id == 999999:
+            self.__log_id = 0
         self.__log_id+=1
         self.__log.append([self.__log_id, data])
     def get_log(self):

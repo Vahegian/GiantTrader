@@ -17,6 +17,10 @@ parser.add_argument('action')
 parser.add_argument('min_amount')
 parser.add_argument('id')
 parser.add_argument('uname')
+parser.add_argument('minUSD')
+parser.add_argument('minLoss')
+parser.add_argument('maxProfit')
+
 
 
 def wrap_with_try(func):
@@ -47,6 +51,9 @@ class Start_Stop_Log_Bot(Resource):
         action = args['action']
         bot_id = args['id']
         uname = args['uname']
+        # minUSD = args['minUSD']
+        # maxLoss = args['minLoss']
+        # maxProfit = args['maxProfit']
         print(pair,bot,action,bot_id,uname)
         if not action:
             return {"message": "Please provide 'pair', 'bot', and 'action'"}, 400

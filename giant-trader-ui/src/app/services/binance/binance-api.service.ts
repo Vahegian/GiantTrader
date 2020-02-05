@@ -18,8 +18,8 @@ export class BinanceApiService {
   };  
 
   private urls = {
-    server : "http://172.20.0.3:5000",
-    // server:"/binance",
+    // server : "http://172.20.0.3:5000",
+    server:"/binance",
     u_login_url : "/inuser",
     u_logout_url: "/outuser",
     u_get_wallet_url : "/ud/wallet",
