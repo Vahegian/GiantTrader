@@ -22,16 +22,16 @@
                                 <th>Bot</th>
                                 <th>Pair</th>
                                 <th>minUSDT</th>
-                                <th>amountBought</th>
-                                <th>priceBought</th>
+                                <th>amount</th>
+                                <th>price</th>
                                 <th>profit</th>
-                                <th>loss</th>
+                                <th>Loss</th>
                                 <th>Ls/Ps</th>
                                 <th>Profit</th>
                                 <th>Total</th>
-                                <th>log</th>
-                                <th><button (click)="update()"
-                                        class="btn btn-outline-primary btn-sm">
+                                <th>Log</th>
+                                <th>More</th>
+                                <th><button (click)="update()" class="btn btn-outline-primary btn-sm">
                                         <div *ngIf="!show_removing">
                                             Update
                                         </div>
@@ -57,12 +57,15 @@
                                 <td>{{item[1].lsps}}</td>
                                 <td>{{item[1].lt_profit_p}}%</td>
                                 <td>${{item[1].total_usdt}}</td>
-                                <td><button (click)="show_bot_log(item[0])"
-                                    class="btn btn-danger btn-sm">Show Log</button>
+                                <td><button (click)="show_bot_log(item[0])" class="btn btn-info btn-sm">Show
+                                        Log</button>
                                 </td>
                                 <td>
-                                    <button (click)="remove_bot(item[0])"
-                                        class="btn btn-danger btn-sm">
+                                    <button (click)="show_more_info(item)" class="btn btn-primary btn-sm"
+                                        data-toggle="modal" data-target="#botModalCenter">More</button>
+                                </td>
+                                <td>
+                                    <button (click)="remove_bot(item[0])" class="btn btn-danger btn-sm">
                                         Remove
                                     </button>
                                 </td>
@@ -71,6 +74,8 @@
                     </table>
                 </div>
             </div>
+        </div>
+        <div class="row">
             <div class="col">
                 <div class="table-wrapper-scroll-y my-custom-scrollbar">
                     <table class="table">
@@ -84,12 +89,39 @@
                         <tbody>
                             <tr *ngFor="let b_log of bot_log">
                                 <td>{{b_log[0]}}</td>
-                                <td class="text-success" >{{b_log[1][0]}}</td>
+                                <td class="text-success">{{b_log[1][0]}}</td>
                                 <td>{{b_log[1][1]}}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="botModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Bot {{modal_info_for_bot[0]}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul>
+                    <li>Num of loss : {{modal_info_for_bot[1].lnum}}</li>
+                    <li>Num of profit : {{modal_info_for_bot[1].pnum}}</li>
+                    <li>loss : {{modal_info_for_bot[1].l_percent}}%</li>
+                    <li>profit : {{modal_info_for_bot[1].p_percent}}%</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

@@ -25,6 +25,7 @@ export class LoginComponent implements OnInit {
         } else {
           this.show_loggingin = false;
           alert("Login Failed");
+          // this.router.navigateByUrl('/main')
         }
       });
     // console.log(uname +" : "+ pass)

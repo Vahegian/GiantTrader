@@ -13,6 +13,7 @@ export class Rollingday10Component implements OnInit {
   public bot_log = []
   public logging_bot_id = "\"press show log\""
   public show_removing = false;
+  public modal_info_for_bot = []
 
   constructor(private rollingdaybot:RollingDayBot, private binance:BinanceApiService) { }
 
@@ -69,6 +70,10 @@ export class Rollingday10Component implements OnInit {
         this.update()
       }
     })
+  }
+
+  show_more_info(botObj){
+    this.modal_info_for_bot = botObj;
   }
 
 }

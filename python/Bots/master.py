@@ -1,11 +1,17 @@
 from bots.rolling_day_trader import RollingDayTrader
 class Master:
     def __init__(self):
-        self.bots = {"RollingDayTrader11/1.5/2.0":[11, 1.5, 2.0],
-                     "RollingDayTrader11/1.5/1.0":[11, 1.1, 1.5],
+        self.bots = {"RollingDayTrader11/1.0/1.0":[11, 1.0, 1.0],
+                     "RollingDayTrader11/1.0/1.5":[11, 1.0, 1.5],
+                     "RollingDayTrader11/1.5/1.0":[11, 1.5, 1.0],
+                     "RollingDayTrader11/1.5/2.0":[11, 1.5, 2.0],
+                     "RollingDayTrader15/1.0/1.5":[15, 1.0, 1.5],
+                     "RollingDayTrader20/1.0/1.5":[20, 1.0, 1.5],
                      "RollingDayTrader15/1.5/2.0":[15, 1.5, 2.0],
                      "RollingDayTrader20/1.5/2.0":[20, 1.5, 2.0],
-                     "RollingDayTrader11/1.5/1.0":[11, 1.5, 1.0]}
+                     "RollingDayTrader50/1.0/1.5":[50, 1.0, 1.5],
+                     "RollingDayTrader100/1.0/1.5":[100, 1.0, 1.5]
+                     }
         self.running_bots = {}
         self.__id = 0
 
