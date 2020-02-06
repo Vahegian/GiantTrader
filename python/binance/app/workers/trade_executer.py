@@ -1,4 +1,6 @@
 from trader.trader import Trader
+import datetime
+from datetime import timedelta
 
 class TradeExec:
     def __init__(self, apiKey, apiSecret, activityWatcher):
@@ -14,8 +16,10 @@ class TradeExec:
         
         self.__wallet = None
         # self.__openOrders = []
+        self.__socket_update_interval = 1 # hours
         self.__prices = {}
         self.start_price_tickers()
+        self.__init_time = datetime.datetime.now()
         # self.__trader.market_buy("XRPUSDT", 10)
         # exit(0)
 
@@ -49,8 +53,21 @@ class TradeExec:
         self.__trader.get_live_ticker_update(self.__update_prices)
 
     def __update_prices(self, msg):
-        for item in msg:
-            self.__prices.update({item['s']: item['c']})
+        """
+            method resets BinanceSocket, which streames asset prices
+            every given period.
+            It also stores 'close' prices to dictionary with following 
+            syntax {"symbol":"price"} 
+        """
+        cur_time = datetime.datetime.now()
+        if self.__init_time+timedelta(hours=self.__socket_update_interval) <= cur_time:
+            print(self.TAG, "restarting BinanceSocket")
+            self.__trader.stop_BinanceSocket()
+            self.start_price_tickers()
+            self.__init_time = cur_time
+        else:
+            for item in msg:
+                self.__prices.update({item['s']: item['c']})
     
     def get_last_prices(self):
         return self.__prices

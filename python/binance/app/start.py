@@ -54,7 +54,7 @@ class LogUser(Resource):
             return {"message":"add user name and password", "status":0}, 400
         else:
             udata = master.get_user_data(uname, upass)
-            print(udata)
+            # print(udata)
             master.open_user_account(udata[1], udata[3], udata[4])
             return {"message":"user logged in",
                     "status":1,
