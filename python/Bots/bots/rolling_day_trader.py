@@ -24,7 +24,7 @@ class RollingDayTrader(BOT):
         self.__loss_percent = float(maxAcceptableLossPercent)
         self.__update_interval_sec = int(updateSec)
         self.__seconds_to_wait_after_sell = int(2.5*60)
-        self.__maxFee = 0.2 # %
+        self.__maxFee = 0.25 # %
         self.__current_amount_usd = 0.0
         self.__profit_last_trade = 0.0
         # cool down for too much loosing variables
@@ -32,9 +32,13 @@ class RollingDayTrader(BOT):
         self.__num_of_loss_trades = 0
         self.__time_of_losses = None
         self.__num_allowed_losses = 1
-        self.__delay_after_losses = 12 #hours 
+        self.__delay_after_losses = 5 #hours 
         self.__loss_window = []
         self.__isCooling = False
+
+        self.__order_acc = 6 #decimal places
+        self.__pair_acc = {"ETHUSDT":4, "BCHUSDT":4, "XRPUSDT":1, "LTCUSDT":4}
+        self.__set_order_acc()
 
     def start(self):
         try:
@@ -53,6 +57,10 @@ class RollingDayTrader(BOT):
             return True
         except:
             return False
+
+    def __set_order_acc(self):
+        if self.__pair in list(self.__pair_acc.keys()):
+            self.__order_acc = self.__pair_acc[self.__pair]
     
     def get_bot_info(self):
         loss_sell = self.__price_bought-((self.__loss_percent/100)*self.__price_bought) #loss sell price
@@ -136,7 +144,7 @@ class RollingDayTrader(BOT):
     def __buy_for_USDT(self, curPrice):
         self.__add_log_at_date_time(f"Trying to buy for {self.__min_USDT} USDT")
         amount = self.__min_USDT/curPrice
-        success, price = self.__binance.buy_market(self.__pair,f"{amount:.5f}")
+        success, price = self.__binance.buy_market(self.__pair, round(amount, self.__order_acc))
         print(self.__TAG, "buy usdt", success, price, amount)
         if success:
             self.__save_bought_time()
@@ -172,8 +180,8 @@ class RollingDayTrader(BOT):
         self.__add_log_at_date_time(f"Percent difference is {percent_diff} and percent to sell at is {percent}")
         if percent_diff >= percent:
             sellable_amount = self.__amount_bought - ((self.__maxFee/100) * self.__amount_bought)
-            success, price = self.__binance.sell_market(self.__pair, f"{sellable_amount:.6f}")
-            self.__add_log_at_date_time(f"closing the order at price {curPrice} and percent difference is {percent_diff}")
+            success, price = self.__binance.sell_market(self.__pair, round(sellable_amount, self.__order_acc))
+            self.__add_log_at_date_time(f"closing {sellable_amount} {self.__pair} at price {curPrice} and percent difference is {percent_diff}")
             print(self.__TAG, "sell percent", success, price, curPrice, percent, percent_diff)
             if success:
                 self.__add_log_at_date_time(f"Sold {sellable_amount} {self.__pair} at {price} on {self.__get_cur_time()}, percent_diff {percent_diff}%")

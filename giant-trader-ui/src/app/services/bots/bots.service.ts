@@ -12,8 +12,8 @@ export class RollingDayBot {
   };  
 
   private urls = {
-    // server : "http://172.20.0.6:5000",
-    server : "/bot",
+    server : "http://172.20.0.6:5000",
+    // server : "/bot",
     get_available_bots_url : "/getavalbots",
     get_running_bots_url : "/getrunningbots",
     start__stop_bot_url : "/start_stop_log_bot"
