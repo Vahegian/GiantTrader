@@ -4,10 +4,11 @@ from bots.exchanges.binance import BinanceAPI
 import datetime
 from datetime import timedelta
 import time
+import sys
 
 
 class RollingDayTrader(BOT):
-    def __init__(self, user, pair, minUSDT=11.0, wantedProfitPercent=1.5, maxAcceptableLossPercent=2.0, updateSec=5):
+    def __init__(self, user, pair, minUSDT=11.0, wantedProfitPercent=1.5, maxAcceptableLossPercent=2.0, updateSec=5, close_next_day=False):
         super(RollingDayTrader, self).__init__()
         self.__TAG = "RollingDayTrader"
         self.__pair = pair
@@ -18,13 +19,13 @@ class RollingDayTrader(BOT):
         self.__price_bought = 0.0
         self.__bought_time = None
         self.__amount_bought = 0.0
-        self.__add_log_at_date_time(f"Init {self.__TAG} with {minUSDT}, {wantedProfitPercent}, {maxAcceptableLossPercent}")
+        self.__add_log_at_date_time(f"Init {self.__TAG} With {minUSDT}, {wantedProfitPercent}%, {maxAcceptableLossPercent}%. Close next day {close_next_day}")
         self.__min_USDT = float(minUSDT)
         self.__profit_percent = float(wantedProfitPercent)
         self.__loss_percent = float(maxAcceptableLossPercent)
         self.__update_interval_sec = int(updateSec)
-        self.__seconds_to_wait_after_sell = int(2.5*60)
-        self.__maxFee = 0.25 # %
+        self.__seconds_to_wait_after_sell = int(15*60)
+        self.__maxFee = 0.15 # %
         self.__current_amount_usd = 0.0
         self.__profit_last_trade = 0.0
         # cool down for too much loosing variables
@@ -34,11 +35,21 @@ class RollingDayTrader(BOT):
         self.__num_allowed_losses = 1
         self.__delay_after_losses = 5 #hours 
         self.__loss_window = []
-        self.__isCooling = False
+        # self.__isCooling = False
+        self.__min_slope = sys.maxsize
+        self.__perv_close = None #[9860, self.__get_cur_time()] # [0.0, "00:00:00"]
 
         self.__order_acc = 6 #decimal places
         self.__pair_acc = {"ETHUSDT":4, "BCHUSDT":4, "XRPUSDT":1, "LTCUSDT":4}
         self.__set_order_acc()
+
+        self.__min_sell_usdt = 10.05
+        self.__close_next_day = close_next_day
+        
+        self.__sold = False
+        self.__time_of_sell = None
+        self.__slope_x = None
+        self.__slope_y = None
 
     def start(self):
         try:
@@ -94,26 +105,95 @@ class RollingDayTrader(BOT):
             run = self.__isRunning
         while run:
             self.__add_log_at_date_time("New Iteration ...")
-            self.__cool_down()
-            if self.__time_of_losses == None:
+            # self.__cool_down()
+            # if self.__time_of_losses == None:
+            #     self.__trade()
+            if not self.__cool_down():
                 self.__trade()
             time.sleep(self.__update_interval_sec)
             with self.__bot_thread_lock:
                 run = self.__isRunning
 
+    # def __cool_down(self):
+    #     if len(self.__loss_window)==self.__num_allowed_losses and self.__time_of_losses!=None:
+    #         temp_time = self.__time_of_losses+timedelta(hours=self.__delay_after_losses)
+    #         time_now = self.__get_cur_time()
+    #         if time_now >= temp_time:
+    #             self.__time_of_losses = None
+    #             self.__loss_window = []
+    #         else:
+    #             self.__add_log_at_date_time(f"Cooling down after {len(self.__loss_window)} losses on {self.__time_of_losses}")
+    #         return True
+    #     else:
+    #         return False
+
+    # def __cool_down(self):
+    #     # time.sleep(60)
+    #     if  len(self.__loss_window)==self.__num_allowed_losses and self.__perv_close != None:
+    #         self.__add_log_at_date_time(f"Cooling down after {len(self.__loss_window)} losses on {self.__time_of_losses}")
+    #         time.sleep(60)
+    #         curPrice = self.__check_cur_price()
+    #         curTime = self.__get_cur_time()
+    #         timeDiffSeconds = (curTime-self.__perv_close[1]).total_seconds()
+    #         priceDiff = (curPrice-self.__perv_close[0])
+    #         # self.__perv_close = [curPrice, curTime]
+    #         try:
+    #             curSlope = timeDiffSeconds/priceDiff
+    #             if self.__min_slope != sys.maxsize:
+    #                 slopeDiff = abs(self.__min_slope-curSlope)
+    #                 slopePercentDiff = (min([abs(self.__min_slope), slopeDiff])/max([abs(self.__min_slope), slopeDiff]))*100 
+    #                 if curSlope<self.__min_slope:
+    #                     slopePercentDiff*=-1
+    #                 self.__add_log_at_date_time(f"Slope: {curSlope:.4f}, Min slope {self.__min_slope:.4f}, Slope diff: {slopeDiff:.4f}, Slope diff%: {slopePercentDiff:.2f}%, Time diff. {timeDiffSeconds:.2f} seconds, Price diff. {priceDiff:.2f} {self.__pair}")
+                    
+    #             if curSlope<self.__min_slope:
+    #                 self.__min_slope = curSlope
+    #                 self.__perv_close[1]=curTime
+    #         except Exception as e:
+    #             self.__add_log_at_date_time(f"Error accured in cool_down: {e}")
+    #             return True 
+    #         return True
+    #     else:
+    #         return True
+
     def __cool_down(self):
-        if len(self.__loss_window)==self.__num_allowed_losses and self.__time_of_losses==None:
-            self.__time_of_losses = self.__get_cur_time()
-        
-        if self.__time_of_losses != None:
-            temp_time = self.__time_of_losses+timedelta(hours=self.__delay_after_losses)
-            time_now = self.__get_cur_time()
-            if time_now >= temp_time:
-                self.__time_of_losses = None
-                self.__loss_window = []
+        # if len(self.__loss_window)==self.__num_allowed_losses:
+        if self.__sold:
+            self.__add_log_at_date_time(f"Cooling down, sold at {self.__time_of_sell}")
+            if self.__time_of_sell+timedelta(hours=12) >= self.__get_cur_time():
+                curSlope = self.__get_current_slope()
+                self.__add_log_at_date_time(f"Current Slope: {curSlope:.4f}")
+                if curSlope > 0.0:
+                    self.__add_log_at_date_time(f"Current Slope is positive resuming")
+                    # self.__loss_window = []
+                    self.__sold = False
+                    self.__slope_x = None
+                    self.__slope_y = None
+                else:
+                    self.__add_log_at_date_time(f"Current Slope is negative cooling")
             else:
-                self.__add_log_at_date_time(f"Cooling down after {len(self.__loss_window)} losses on {self.__time_of_losses}")
-                time.sleep(60)
+                curSlope = self.__get_current_slope()
+                self.__add_log_at_date_time(f"Min slope time not reached, Current Slope: {curSlope:.4f}")
+            return True
+        else:
+            return False
+            
+
+    def __get_current_slope(self, time_window_sec=60):
+        if self.__slope_x in None or self.__slope_y is None:
+            self.__slope_x = self.__check_cur_price()
+            self.__slope_y = self.__get_cur_time()
+        time.sleep(time_window_sec)
+        x2_Price = self.__check_cur_price()
+        y2_curTime = self.__get_cur_time()
+        timeDiffSeconds = (y2_curTime-self.__slope_y).total_seconds()
+        priceDiff = x2_Price-self.__slope_x
+        self.__add_log_at_date_time(f"Trying to calculate slope with {time_window_sec} sec. interval, price diff {priceDiff}, time diff {timeDiffSeconds} sec.")
+        try:
+            curSlope = timeDiffSeconds/priceDiff
+            return curSlope
+        except:
+            return 0.0
         
     def __trade(self):
         price = self.__check_cur_price()
@@ -127,7 +207,8 @@ class RollingDayTrader(BOT):
                     self.__sell_percent_profit(price)
                 else:
                     self.__sell_percent_loss(price)
-                self.__close_position_if_new_day(price)
+                if self.__close_next_day:
+                    self.__close_position_if_new_day(price)
             self.__current_amount_usd = price*self.__amount_bought
 
     def __check_resource_availability(self):
@@ -165,9 +246,15 @@ class RollingDayTrader(BOT):
 
     def __sell_percent_loss(self, curPrice):
         self.__add_log_at_date_time(f"Trying to sell {self.__loss_percent} percent at loss for {self.__pair} ")
-        if self.__sell_at_percent_diff(curPrice, self.__loss_percent):
-            self.__num_of_loss_trades+=1
-            self.__loss_window.append(1)
+        total = float(curPrice)*float(self.__amount_bought)
+        if total >= self.__min_sell_usdt:
+            if self.__sell_at_percent_diff(curPrice, self.__loss_percent):
+                self.__num_of_loss_trades+=1
+                # self.__loss_window.append(1)
+                # self.__perv_close = [curPrice, self.__get_cur_time()]
+                self.__time_of_losses = self.__get_cur_time()
+        else:
+            self.__add_log_at_date_time(f"Can't sell, current total is {total}, but min allowed is {self.__min_sell_usdt}")
 
     def __sell_percent_profit(self, curPrice):
         self.__add_log_at_date_time(f"Trying to sell {self.__profit_percent} percent at profit for {self.__pair} ")
@@ -187,8 +274,14 @@ class RollingDayTrader(BOT):
                 self.__add_log_at_date_time(f"Sold {sellable_amount} {self.__pair} at {price} on {self.__get_cur_time()}, percent_diff {percent_diff}%")
                 self.__profit_last_trade =(price*self.__amount_bought) - (self.__amount_bought*self.__price_bought)
                 self.__add_log_at_date_time(f"waiting {self.__seconds_to_wait_after_sell} seconds ....")
-                time.sleep(self.__seconds_to_wait_after_sell)
+                # time.sleep(self.__seconds_to_wait_after_sell)
                 self.__amount_bought = 0
+                self.__sold = True
+                self.__time_of_sell = self.__get_cur_time()
+            else:
+                self.__add_log_at_date_time(f"Failed to sell {sellable_amount} {self.__pair} at {price} on {self.__get_cur_time()}, percent_diff {percent_diff}%")
+                self.__add_log_at_date_time("waiting 60 seconds ...")
+                time.sleep(60)
         return success
                 
 
@@ -199,8 +292,12 @@ class RollingDayTrader(BOT):
         isNextDay = (curTime >= tempTime)
         self.__add_log_at_date_time(f"Next day=={isNextDay} :: Current time {curTime} time of purchase {self.__bought_time}")
         if isNextDay:
-            self.__add_log_at_date_time(f"Selling now because it is the next day") 
-            self.__sell_at_percent_diff(curPrice, 0.0)
+            self.__add_log_at_date_time(f"Selling now because it is the next day")
+            total = float(curPrice)*float(self.__amount_bought)
+            if total >= self.__min_sell_usdt: 
+                self.__sell_at_percent_diff(curPrice, 0.0)
+            else:
+                self.__add_log_at_date_time(f"Can't sell, current total is {total}, but min allowed is {self.__min_sell_usdt}")
 
     def __add_log_at_date_time(self, msg):
         data = [f"RollingDayTrader: log time {self.__get_cur_time()}", msg]

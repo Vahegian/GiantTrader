@@ -1,4 +1,4 @@
-FROM python:3.7.5-buster
+FROM ubuntu:18.04
 
 # Environment variables
 ENV PYTHON_VERSION=3
@@ -12,6 +12,18 @@ EXPOSE 5000/tcp
 RUN mkdir ${ENTRY_PATH}
 WORKDIR ${ENTRY_PATH}
 # \Working directory
+
+# Software b1
+RUN apt-get update && \
+    apt-get -y upgrade && \
+    apt-get install -y tzdata && \
+    apt-get install -y python${PYTHON_VERSION} && \
+    apt-get install -y python${PYTHON_VERSION}-pip && \
+    apt-get install -y iputils-ping && \
+    apt-get install -y libsm6 libxext6 libxrender-dev && \
+    apt-get install -y libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+# \Software b1
 
 COPY ./requirements.txt ./
 

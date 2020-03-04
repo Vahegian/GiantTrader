@@ -3,6 +3,9 @@ import time
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from flask_cors import CORS
+import logging
+logging.basicConfig(filename="logs.txt", filemode="w")
+logger = logging.getLogger(__name__)
 
 
 master = None
@@ -33,7 +36,7 @@ def wrap_with_try(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            print(str(e))
+            logger.debug(str(e))
             return {"message": str(e), "status":0}, 201
     return inner
 

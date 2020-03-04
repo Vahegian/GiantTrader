@@ -2,11 +2,16 @@ import time
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from flask_cors import CORS
-from use_DNN9_T512_B2 import USE_DNN9_T512_B2
 import tensorflow as tf
 import json
+from percentDiff.percent_cnn import PCNNResNet50
+# import logging
+# logging.basicConfig
+# logger = logging.getLogger(__name__)
 
-models = {"DNN9-T512-B2-D1-Q120": USE_DNN9_T512_B2}
+models = {
+            "PCNNResNet50" : [PCNNResNet50, "percentDiff/model_weights.h5"]    
+        }
 
 app = Flask(__name__)
 api = Api(app)
@@ -22,26 +27,9 @@ def wrap_with_try(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            print(str(e))
+            print(str(e.with_traceback(None)))
             return {"message": str(e)}, 400
     return inner
-
-class GetNNPred(Resource):
-    @wrap_with_try
-    def post(self):
-        args = parser.parse_args()
-        data = args['data']
-        data = json.loads(data)
-        print(data, type(data), len(data))
-        if not data:
-            return {"message":"add 'data'"}, 400
-        else:
-            model = USE_DNN9_T512_B2()
-            model.init_model()
-            pred = model.get_model_pred(data)
-            return {"status":1,
-                    "side":pred[0],
-                    "conf": str(pred[1])}, 201
 
 class GetNNBatchPred(Resource):
     @wrap_with_try
@@ -54,9 +42,11 @@ class GetNNBatchPred(Resource):
             return {"message":"add 'data' and 'model'"}, 400
         else:
             data = json.loads(data)
-            model = models[model_name]()
-            model.init_model()
-            preds = model.predict(data)
+            model = models[model_name][0]()
+            # logger.debug(model)
+            resnet = model.get_resnet_50(weights=models[model_name][1])
+            # model.init_model()
+            preds = model.predict(resnet, data)
             return {"status":1,
                     "preds": preds}, 201
 
@@ -65,7 +55,6 @@ class GetAvailableModels(Resource):
     def get(self):
         return {"models": list(models.keys())}
 
-api.add_resource(GetNNPred, '/getnnpred')
 api.add_resource(GetNNBatchPred, '/getnnbatchpred')
 api.add_resource(GetAvailableModels, '/getmodels')
 

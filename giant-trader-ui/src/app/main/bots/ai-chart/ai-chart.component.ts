@@ -13,9 +13,11 @@ export class AIChartComponent implements OnInit {
   @Input() public model_name;
   public ai_preds = null;
   public lineChartData = [
-    { data: [], label: 'Close', backgroundColor: "rgba(100, 48, 240, 0.3)",
-                borderColor: '', type: 'line'},
-    { data: [], label: '', backgroundColor:[], type: 'bar'},
+    { data: [], label: 'Price', borderColor: "rgba(66, 12, 89, 1.0)", backgroundColor:"rgba(255, 255, 255, 0.0)", type: 'line'},
+    { data: [], label: 'Buy signal', fill: false, borderColor:"rgba(0, 255, 0, 0.3)", type: 'line'},
+    { data: [], label: 'Hodl signal', fill: false, borderColor:"rgba(0, 0, 255, 0.3)", type: 'line'},
+    { data: [], label: 'Sell signal', fill: false, borderColor:"rgba(255, 0, 0, 0.3)", type: 'line'},
+    { data: [], label: 'Performance', fill: false, borderColor:"rgba(219, 199, 132, 0.9)", type: 'line'}
    ];
 
   public lineChartLabels: Label[] = [];
@@ -25,7 +27,7 @@ export class AIChartComponent implements OnInit {
   public lineChartColors: Color[] = [];
   public lineChartLegend = true;
   public lineChartPlugins = [];
-  public lineChartType = 'bar';
+  public lineChartType = 'line';
 
   constructor(public engine_api: BinanceApiService, public ai: AI) {}
 
@@ -35,60 +37,51 @@ export class AIChartComponent implements OnInit {
   plot_chart(){
     this.engine_api.get_ohlc(this.engine_api.working_pair, this.days)
     .subscribe(data=>{
-      this.lineChartData[0].data = [];
-      this.lineChartData[1].data = [];
-      this.lineChartData[1].backgroundColor = [];
+      for (let item of this.lineChartData){
+        item.data = []
+      }
       this.lineChartLabels = [];
-      var final_data = []
-      var temp = [[],[],[],[]];
-      for (var item in data){
-        var close = data[item].close;
-        this.lineChartData[0].data.push(close);
+      let final_data = []
+      for (let item in data){
+        let close = data[item].close;
+        this.lineChartData[0].data.push(parseFloat(close));
         this.lineChartLabels.push(item);
-        temp[0].push(data[item].high)
-        temp[1].push(close)
-        temp[2].push(data[item].open)
-        temp[3].push(data[item].low)
-        if (temp[0].length==30){
-          var batch = [];
-          for (var index in temp){
-            batch = batch.concat(temp[index]);
-            temp[index].shift()
-          }
-          final_data.push(JSON.stringify(batch));
-        }
+        final_data.push(data[item])
       }
       this.add_predictions(final_data);
     });
   }
 
   add_predictions(final_data){
-    // console.log(this.model_name)
+    let qty = 0.0
+    let preds_started = false;
+    alert("Loading '"+this.model_name+"'  please wait ....")
     this.ai.get_batch_pred(this.model_name,JSON.stringify(final_data))
-      .subscribe(preds=>{
-        // console.log(preds);
-        this.ai_preds = preds["preds"];
-        var diff = this.lineChartData[0]["data"].length-this.ai_preds.length;
-        this.lineChartData[1].data = new Array(diff).fill(0);
-        this.lineChartData[1].backgroundColor = new Array(diff).fill("rgba(0, 0, 0, 0.0)");
-        for (var pred in this.ai_preds){
-          pred = this.ai_preds[pred]
-          // console.log(pred);
-          // var conf = parseFloat(pred["conf"]);
-          var price = parseFloat(this.lineChartData[0]["data"][diff]);
-          var bar_height = price
-          // console.log(diff+":"+conf+":"+price+":"+bar_height);
-          if (pred["side"] == "BUY"){
-            this.lineChartData[1].data.push(bar_height);
-            this.lineChartData[1].backgroundColor.push("rgba(0, 255, 0, 0.7)");
-          }else{
-            this.lineChartData[1].data.push(bar_height);
-            this.lineChartData[1].backgroundColor.push("rgba(255, 0, 0, 0.7)");
+      .subscribe(data=>{
+          let preds = data.preds
+          let max_price = Math.max(...this.lineChartData[0].data)*1.5;
+          let buget = 0.0;
+          for (let index in this.lineChartData[0].data){
+            let buy =  parseFloat(preds[index][0]);
+            let hodl = parseFloat(preds[index][1]);
+            let sell = parseFloat(preds[index][2]);
+            this.lineChartData[1].data.push(buy*max_price);
+            this.lineChartData[2].data.push(hodl*max_price);
+            this.lineChartData[3].data.push(sell*max_price);
+            let curPrice = parseFloat(this.lineChartData[0].data[index]);
+            
+            if (buy!=0 && sell!=0 && hodl!=0 && !preds_started){buget = curPrice; preds_started=true}
+
+            if (buy>sell && buy>hodl && buget>0.0){
+              this.lineChartData[4].data.push(buget)
+              qty = buget/curPrice;
+            }else if (sell>buy && sell>hodl && qty>0){
+              buget = curPrice*qty;
+              this.lineChartData[4].data.push(buget)
+            }else{
+              this.lineChartData[4].data.push(buget)
+            }
           }
-          diff++;
-        }
-        // console.log(diff);
-        // console.log(this.lineChartData)
       });
   }
 

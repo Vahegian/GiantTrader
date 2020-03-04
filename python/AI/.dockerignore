@@ -1,2 +1,4 @@
 data
 private
+img_data
+*.npy

@@ -8,8 +8,8 @@ and buy or sell signals associated with the images.
 import numpy as np
 
 # market_data_file = str(input("please specify relative path to the markets file '.npy' > \n"))
-coins_data_file = "data/private/coins.npy"
-market_data_file = "data/private/markets.npy"
+coins_data_file = "private/coins.npy"
+market_data_file = "private/markets.npy"
 
 coins_data_file = np.load(coins_data_file, allow_pickle=True)
 market_data_file = np.load(market_data_file, allow_pickle=True)

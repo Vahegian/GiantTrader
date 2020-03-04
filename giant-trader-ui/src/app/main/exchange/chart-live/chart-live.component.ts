@@ -9,7 +9,7 @@ import { BinanceApiService } from 'src/app/services/binance/binance-api.service'
 })
 export class ChartLiveComponent implements OnInit {
   public mainChartData = [
-    { data: [], label: "please select a pair", backgroundColor: "rgba(50, 200, 120, 0.2)" }
+    { data: [], label: "please select a pair", backgroundColor: [] }
   ];
   public mainChartLabels: Label[] = [];
   public mainChartOptions = {
@@ -18,12 +18,14 @@ export class ChartLiveComponent implements OnInit {
   public mainChartColors: Color[] = [];
   public mainChartLegend = true;
   public mainChartPlugins = [];
-  public mainChartType = 'line';
+  public mainChartType = 'bar';
   private temp_pair = "";
   public max_allowed_points = 60;
   public interval = 2;
   // public max_posible = 0;
   constructor(public binance_api: BinanceApiService) { }
+
+  private prev_price = null;
 
   ngOnInit() {
     var timer_counter = 0;
@@ -45,12 +47,20 @@ export class ChartLiveComponent implements OnInit {
           // console.log(data);
           if (this.mainChartData[0].data.length > this.max_allowed_points) { 
             var diff = this.mainChartData[0].data.length - this.max_allowed_points
-            for(let i=0; i<diff; i++){this.mainChartData[0].data.shift(); this.mainChartLabels.shift()}
+            for(let i=0; i<diff; i++){this.mainChartData[0].data.shift(); this.mainChartLabels.shift(); this.mainChartData[0].backgroundColor.shift()}
           }
           // try {
+          if (this.prev_price==null){this.prev_price=parseFloat(data[this.temp_pair]);}
           var date = new Date()
-          this.mainChartData[0].data.push(parseFloat(data[this.temp_pair]).toFixed(6));
+          let prcent_diff = ((1.0-((parseFloat(data[this.temp_pair])/this.prev_price)))*100);
+          this.mainChartData[0].data.push(prcent_diff.toFixed(2));
           this.mainChartLabels.push(date.toString().split(" ")[4]);
+          if (prcent_diff>0.000000){
+            this.mainChartData[0].backgroundColor.push("rgba(50, 200, 120, 0.2)");
+          }else{
+            this.mainChartData[0].backgroundColor.push("rgba(200, 50, 50, 0.2)");
+          }
+          this.prev_price = parseFloat(data[this.temp_pair]);
           // } catch{ }
         });
     } else {
@@ -59,6 +69,8 @@ export class ChartLiveComponent implements OnInit {
         this.mainChartData[0].label = this.temp_pair;
         this.mainChartLabels = [];
         this.mainChartData[0].data = [];
+        this.prev_price = 0.0
+        this.mainChartData[0].backgroundColor = []
       }
     }
   }
