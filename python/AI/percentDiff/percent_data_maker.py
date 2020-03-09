@@ -22,32 +22,34 @@ def create_data(ope_n, high, low, close):
     # diff_close_prevClose = get_percent_diff(prev_close, close) # diff between previous and current close
     elem_list = get_all_combos([low,ope_n,close,high])
     pixcels = []
-    if close > ope_n:
-        for item in elem_list: #BGR
-            pixcels.append([0,255,0])
-    else:
-        for item in elem_list:
-            pixcels.append([0, 0, 255])
+    # dim1 = 201 # must be odd number
+    # img_one_ohlc = np.zeros((dim1,dim1*6,3), dtype="float32")
+    # center_x, center_y = int(((dim1-1)/2)+1), int(((dim1-1)/2)+1)
+    for item in elem_list: #BGR
+        base_tone = 100-(100*item)
+        if close > ope_n:
+            # img_one_ohlc = cv2.circle(img_one_ohlc, (center_x, center_y), int(center_y-(center_y*item)), (int(255-(255*item)), 255, 0), -1)  
+            pixcels.append([base_tone, 255, base_tone])
+        else:
+            pixcels.append([base_tone, base_tone, 255])
+            # img_one_ohlc = cv2.circle(img_one_ohlc, (center_x, center_y), int(center_y-(center_y*item)), (int(255-(255*item)), 0, 255), -1) 
+        # center_x = center_x+dim1
 
     # max_val_to_add =1.0 - max([x[0] for x in pixcels])
 
     # for item in pixcels:
     #     item[0]=int((item[0]+max_val_to_add)*255)
-    return pixcels
+    # return img_one_ohlc
+    return [pixcels]
 
-def create_images_from_data(data:list, out_folder_train:str, out_folder_val:str):
+def create_images_from_data(data:list, out_folder:str):
     im_id = 0
-    train_data_qty = 0
-    len80Percent = int(len(data)*0.8)
-    out_folder = out_folder_train
     for batch in data:
-        if im_id>=len80Percent:
-            out_folder = out_folder_val
-            train_data_qty = im_id
-            im_id = 0
         img = []
-        for item in batch:
-            img.append(create_data(item[0],item[1],item[2],item[3])) 
+        for item in batch: # item = 'ohlc'
+            ohlc_img = create_data(item[0],item[1],item[2],item[3])
+            for layer in ohlc_img:
+                img.append(layer) 
         
         img = cv2.resize(np.array(img, dtype="float32"),(197,197))
         im_id+=1
@@ -55,8 +57,9 @@ def create_images_from_data(data:list, out_folder_train:str, out_folder_val:str)
         # cv2.waitKey(10)
         cv2.imwrite(f"{out_folder}/{im_id}.jpg", img)
         
-        if im_id%500==0:
-            print(f"saved {im_id}/{len(data)-train_data_qty} images to folder {out_folder}")
+        if im_id%150==0:
+            print(f"saved {im_id}/{len(data)} images to folder {out_folder}")
+    print(f"saved {im_id}/{len(data)} images to folder {out_folder}")
 
 if __name__ == "__main__":
 
@@ -128,6 +131,9 @@ if __name__ == "__main__":
    
     print(f"datapoints After Trimming -  buy: {len(side_buy)} hodl: {len(side_hodl)} sell: {len(side_sell)} Total: {len(side_buy)+len(side_hodl)+len(side_sell)}")
 
+    '''
+        creat all necessary folders 
+    '''
     TRAIN_FOLDER = "train"
     VAL_FOLDER = "val"
     
@@ -149,13 +155,23 @@ if __name__ == "__main__":
     os.system(f"mkdir {BUY_FOLDER_VAL}")
     os.system(f"mkdir {HODL_FOLDER_VAL}")
     os.system(f"mkdir {SELL_FOLDER_VAL}")
-    # os.system("ls")
-    # exit(1)
-
+    
+    '''
+        create images using multiple threads per folder
+    '''
     import threading
-    t1 = threading.Thread(target=create_images_from_data, args=(side_buy, BUY_FOLDER, BUY_FOLDER_VAL))
-    t1.start()
-    t2 = threading.Thread(target=create_images_from_data, args=(side_hodl, HODL_FOLDER, HODL_FOLDER_VAL))
-    t2.start()
-    t3 = threading.Thread(target=create_images_from_data, args=(side_sell, SELL_FOLDER, SELL_FOLDER_VAL))
-    t3.start()
+    def process(data, folder, workers=5):
+        itt_qty = int(len(data)/workers)
+        for i in range(workers):
+            threading.Thread(target=create_images_from_data, args=(data[itt_qty*i:itt_qty*(i+1)], folder)).start()
+
+    train_len = int((len(side_buy)*0.8)+0.5)
+    process(side_buy[:train_len], BUY_FOLDER)
+    process(side_hodl[:train_len], HODL_FOLDER)
+    process(side_sell[:train_len], SELL_FOLDER)
+
+    process(side_buy[train_len:], BUY_FOLDER_VAL)
+    process(side_hodl[train_len:], HODL_FOLDER_VAL)
+    process(side_sell[train_len:], SELL_FOLDER_VAL)
+    
+    # create_images_from_data(side_buy, BUY_FOLDER, BUY_FOLDER_VAL)

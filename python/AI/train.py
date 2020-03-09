@@ -6,7 +6,7 @@ if __name__ == "__main__":
     # print(data,len(data))
     filepath="percentDiff/model_weights.h5"
     pdnn = PCNNResNet50()
-    model = pdnn.get_resnet_50(weights=None)
+    model = pdnn.get_resnet_50(weights=filepath)
     pdnn.train(model, weights_out=filepath, gui=True)
     # print(create_data(9,10,14,20))
     # preds = pdnn.predict_batch(data)

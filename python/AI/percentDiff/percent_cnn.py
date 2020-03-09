@@ -25,11 +25,19 @@ class PCNNResNet50:
     def get_resnet_50(self, input_shape :tuple=(197,197,3), out_classes :int=3, weights :str=None):
         if self.__model == None:
             K.clear_session()
+            from keras.backend.tensorflow_backend import set_session
+            import tensorflow as tf
+            config = tf.ConfigProto()
+            config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
+            #config.log_device_placement = True  # to log device placement (on which device the operation ran)
+            sess = tf.Session(config=config)
+            set_session(sess)  # set this TensorFlow session as the default session for Keras
             print("\nInitializing The Model\n")
-            LR = 0.00001
+            
+            LR = 0.0001
             # DECAY = LR/EPOCHS
-            FC_LAYERS = [1024, 1024, 1024]
-            dropout = 0.5
+            FC_LAYERS = [1024, 1024, 1024, 1024]
+            dropout = 0.2
 
             base_model = ResNet50(weights='imagenet', 
                             include_top=False, 
@@ -68,12 +76,12 @@ class PCNNResNet50:
 
         train_generator = train_datagen.flow_from_directory("percentDiff/train", 
                                                         target_size=self.__img_dim, 
-                                                        batch_size=32)
+                                                        batch_size=8)
         val_generator = train_datagen.flow_from_directory("percentDiff/val", 
                                                         target_size=self.__img_dim, 
-                                                        batch_size=32)
+                                                        batch_size=8)
         print(f"\n prediciton indices: {train_generator.class_indices}, {train_generator.class_mode}, {train_generator.batch_index}\n")
-        num_train_images = 4096
+        num_train_images = 5000
 
         checkpoint = ModelCheckpoint(weights_out, monitor=["acc"], verbose=1, mode='max')
         callbacks_list = [checkpoint]
@@ -83,7 +91,7 @@ class PCNNResNet50:
             callbacks_list = [checkpoint, svs]
 
         history = model.fit_generator(train_generator, validation_data=val_generator, epochs=self.__EPOCHS, workers=8, 
-                                        steps_per_epoch=num_train_images, validation_steps=num_train_images, #BATCH_SIZE, 
+                                        steps_per_epoch=num_train_images, validation_steps=1000, #BATCH_SIZE, 
                                         shuffle=True, callbacks=callbacks_list)
     
     def predict(self, model, percent_data:list):

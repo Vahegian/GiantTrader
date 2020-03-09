@@ -159,3 +159,5 @@ DNN_T512_B2
 private
 img_data
 logs.txt
+val/
+train/
