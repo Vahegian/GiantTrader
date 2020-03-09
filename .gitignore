@@ -153,3 +153,9 @@ testem.log
 Thumbs.db
 dist
 DNN_T512_B2
+*.npy
+*.h5
+*.hdf5
+private
+img_data
+logs.txt
