@@ -35,9 +35,16 @@ def create_data(ope_n, high, low, close):
     #     item[0]=int((item[0]+max_val_to_add)*255)
     return pixcels
 
-def create_images_from_data(data:list, out_folder:str):
+def create_images_from_data(data:list, out_folder_train:str, out_folder_val:str):
     im_id = 0
+    train_data_qty = 0
+    len80Percent = int(len(data)*0.8)
+    out_folder = out_folder_train
     for batch in data:
+        if im_id>=len80Percent:
+            out_folder = out_folder_val
+            train_data_qty = im_id
+            im_id = 0
         img = []
         for item in batch:
             img.append(create_data(item[0],item[1],item[2],item[3])) 
@@ -49,7 +56,7 @@ def create_images_from_data(data:list, out_folder:str):
         cv2.imwrite(f"{out_folder}/{im_id}.jpg", img)
         
         if im_id%500==0:
-            print(f"saved {im_id}/{len(data)} images to folder {out_folder}")
+            print(f"saved {im_id}/{len(data)-train_data_qty} images to folder {out_folder}")
 
 if __name__ == "__main__":
 
@@ -121,25 +128,34 @@ if __name__ == "__main__":
    
     print(f"datapoints After Trimming -  buy: {len(side_buy)} hodl: {len(side_hodl)} sell: {len(side_sell)} Total: {len(side_buy)+len(side_hodl)+len(side_sell)}")
 
+    TRAIN_FOLDER = "train"
+    VAL_FOLDER = "val"
+    
+    os.system(f"rm -r {TRAIN_FOLDER}")
+    os.system(f"rm -r {VAL_FOLDER}")
+    os.system(f"mkdir {TRAIN_FOLDER}")
+    os.system(f"mkdir {VAL_FOLDER}")
 
-    BUY_FOLDER = "img_data/buy"
-    HODL_FOLDER = "img_data/hodl"
-    SELL_FOLDER = "img_data/sell"
-    # os.system("ls")
-    os.system(f"rm -r {BUY_FOLDER}")
-    os.system(f"rm -r {HODL_FOLDER}")
-    os.system(f"rm -r {SELL_FOLDER}")
-    # os.system("ls img_data/buy")
+    BUY_FOLDER = f"{TRAIN_FOLDER}/buy"
+    HODL_FOLDER = f"{TRAIN_FOLDER}/hodl"
+    SELL_FOLDER = f"{TRAIN_FOLDER}/sell"
+    BUY_FOLDER_VAL = f"{VAL_FOLDER}/buy"
+    HODL_FOLDER_VAL = f"{VAL_FOLDER}/hodl"
+    SELL_FOLDER_VAL = f"{VAL_FOLDER}/sell"
+    
     os.system(f"mkdir {BUY_FOLDER}")
     os.system(f"mkdir {HODL_FOLDER}")
     os.system(f"mkdir {SELL_FOLDER}")
+    os.system(f"mkdir {BUY_FOLDER_VAL}")
+    os.system(f"mkdir {HODL_FOLDER_VAL}")
+    os.system(f"mkdir {SELL_FOLDER_VAL}")
     # os.system("ls")
     # exit(1)
 
     import threading
-    t1 = threading.Thread(target=create_images_from_data, args=(side_buy, BUY_FOLDER))
+    t1 = threading.Thread(target=create_images_from_data, args=(side_buy, BUY_FOLDER, BUY_FOLDER_VAL))
     t1.start()
-    t2 = threading.Thread(target=create_images_from_data, args=(side_hodl, HODL_FOLDER))
+    t2 = threading.Thread(target=create_images_from_data, args=(side_hodl, HODL_FOLDER, HODL_FOLDER_VAL))
     t2.start()
-    t3 = threading.Thread(target=create_images_from_data, args=(side_sell, SELL_FOLDER))
+    t3 = threading.Thread(target=create_images_from_data, args=(side_sell, SELL_FOLDER, SELL_FOLDER_VAL))
     t3.start()

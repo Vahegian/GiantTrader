@@ -28,7 +28,7 @@ class PCNNResNet50:
             print("\nInitializing The Model\n")
             LR = 0.00001
             # DECAY = LR/EPOCHS
-            FC_LAYERS = [512, 512, 512]
+            FC_LAYERS = [1024, 1024, 1024]
             dropout = 0.5
 
             base_model = ResNet50(weights='imagenet', 
@@ -66,11 +66,14 @@ class PCNNResNet50:
         preprocessing_function=preprocess_input
         )
 
-        train_generator = train_datagen.flow_from_directory("percentDiff/img_data", 
+        train_generator = train_datagen.flow_from_directory("percentDiff/train", 
                                                         target_size=self.__img_dim, 
-                                                        batch_size=16)
+                                                        batch_size=32)
+        val_generator = train_datagen.flow_from_directory("percentDiff/val", 
+                                                        target_size=self.__img_dim, 
+                                                        batch_size=32)
         print(f"\n prediciton indices: {train_generator.class_indices}, {train_generator.class_mode}, {train_generator.batch_index}\n")
-        num_train_images = 1024
+        num_train_images = 4096
 
         checkpoint = ModelCheckpoint(weights_out, monitor=["acc"], verbose=1, mode='max')
         callbacks_list = [checkpoint]
@@ -79,8 +82,8 @@ class PCNNResNet50:
             svs = ShowValStats("hist.npy")
             callbacks_list = [checkpoint, svs]
 
-        history = model.fit_generator(train_generator, epochs=self.__EPOCHS, workers=8, 
-                                        steps_per_epoch=num_train_images, #BATCH_SIZE, 
+        history = model.fit_generator(train_generator, validation_data=val_generator, epochs=self.__EPOCHS, workers=8, 
+                                        steps_per_epoch=num_train_images, validation_steps=num_train_images, #BATCH_SIZE, 
                                         shuffle=True, callbacks=callbacks_list)
     
     def predict(self, model, percent_data:list):
