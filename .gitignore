@@ -161,3 +161,4 @@ img_data
 logs.txt
 val/
 train/
+*.csv

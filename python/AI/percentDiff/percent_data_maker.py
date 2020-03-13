@@ -9,7 +9,7 @@ def get_percent_diff(var1: float, var2: float):
     return 1.0-(min([var1, var2])/max([var1, var2]))
 
 
-def get_all_combos(elem_list: list):
+def get_all_combos(elem_list: list): 
     elem_diff_list = []
     for item1_index in range(len(elem_list)):
         for item2_index in range(item1_index, len(elem_list)):
