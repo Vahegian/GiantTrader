@@ -1,4 +1,5 @@
 # Giant Trader 
+[Demo](https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:6644926669507317760?compact=1)
 
 The software can connect to "Binance" exchange and perform trades with different neural networks or hardcoded rules. It provides a user interface with charts and feedback text describing the current state. 
 
@@ -54,6 +55,3 @@ To immediately prevent bots from placing orders just log out the user from the t
 
 <hr>
 
-<h3>Demo</h3>
-
-<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:6644926669507317760?compact=1" height="284" width="504" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
