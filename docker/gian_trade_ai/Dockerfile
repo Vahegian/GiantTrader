@@ -20,6 +20,7 @@ RUN apt-get update && \
     apt-get install -y python${PYTHON_VERSION} && \
     apt-get install -y python${PYTHON_VERSION}-pip && \
     apt-get install -y iputils-ping && \
+    apt-get install -y libsm6 libxext6 libxrender-dev && \
     apt-get install -y libpq-dev && \
     rm -rf /var/lib/apt/lists/*
 # \Software b1

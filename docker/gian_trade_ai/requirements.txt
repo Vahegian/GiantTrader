@@ -22,6 +22,7 @@ Markdown==3.1.1
 MarkupSafe==1.1.1
 mock==3.0.5
 numpy==1.17.4
+opencv-contrib-python==4.2.0.32
 pandas==0.25.3
 pika==1.1.0
 protobuf==3.11.2
@@ -40,3 +41,4 @@ tensorflow==1.5.0
 tensorflow-tensorboard==1.5.1
 termcolor==1.1.0
 Werkzeug==0.16.0
+

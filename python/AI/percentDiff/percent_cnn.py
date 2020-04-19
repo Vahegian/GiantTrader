@@ -36,7 +36,7 @@ class PCNNResNet50:
             
             LR = 0.0001
             # DECAY = LR/EPOCHS
-            FC_LAYERS = [1024, 1024, 1024, 1024]
+            FC_LAYERS = [512, 512, 512]
             dropout = 0.2
 
             base_model = ResNet50(weights='imagenet', 
@@ -100,7 +100,7 @@ class PCNNResNet50:
         img  = []
         for item in percent_data:
             # item = json.loads(item)
-            img.append(create_data(float(item["open"]), float(item["high"]), float(item["low"]), float(item["close"])))
+            img.append(create_data(float(item["open"]), float(item["high"]), float(item["low"]), float(item["close"]))[0])
             if len(img) == NUM_OF_DATAPOINTS:
                 img_to_pred = np.array(img, dtype="float32")
                 img_to_pred = cv2.resize(img_to_pred, self.__img_dim)
