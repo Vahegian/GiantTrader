@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, KeyValueDiffers } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -34,18 +34,18 @@ export class RollingDayBot {
   startBot(bot, pair, uname): Observable<any>{
     var data = JSON.stringify({"pair":pair,"bot":bot, "action":"start", "uname":uname})
     return this.http.post<any>(this.urls.server+this.urls.start__stop_bot_url, data,
-                                this.httpOptions)
+                                this.httpOptions);
   }
 
   stopBot(bot_id): Observable<any>{
     var data = JSON.stringify({"id":bot_id, "action":"stop"})
     return this.http.post<any>(this.urls.server+this.urls.start__stop_bot_url, data,
-                                this.httpOptions)
+                                this.httpOptions);
   }
 
   BotLog(bot_id): Observable<any>{
     var data = JSON.stringify({"id":bot_id, "action":"log"})
     return this.http.post<any>(this.urls.server+this.urls.start__stop_bot_url, data,
-                                this.httpOptions)
+                                this.httpOptions);
   }
 }

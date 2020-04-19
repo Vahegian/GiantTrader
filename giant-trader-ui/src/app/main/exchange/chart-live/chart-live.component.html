@@ -1,6 +1,17 @@
 <div class="card shadow p-3 mb-5 bg-white rounded">
     <div class="row">
         <div class="col">
+            <h3>Percent difference chart</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <label>
+                <input [checked]="showLiveChart" (change)="showLiveChart = !showLiveChart" type="checkbox" checked
+                    autocomplete="off"> Start
+            </label>
+        </div>
+        <div class="col">
             <select [(ngModel)]="interval" class="custom-select">
                 <option value="2">2 seconds</option>
                 <option value="6">6 seconds</option>

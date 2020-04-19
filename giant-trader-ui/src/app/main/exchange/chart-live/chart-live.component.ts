@@ -8,6 +8,8 @@ import { BinanceApiService } from 'src/app/services/binance/binance-api.service'
   styleUrls: ['./chart-live.component.css']
 })
 export class ChartLiveComponent implements OnInit {
+  public showLiveChart = false;
+
   public mainChartData = [
     { data: [], label: "please select a pair", backgroundColor: [] }
   ];
@@ -25,7 +27,7 @@ export class ChartLiveComponent implements OnInit {
   // public max_posible = 0;
   constructor(public binance_api: BinanceApiService) { }
 
-  private prev_price = null;
+  private prev_price = -0.1;
 
   ngOnInit() {
     var timer_counter = 0;
@@ -33,7 +35,9 @@ export class ChartLiveComponent implements OnInit {
       timer_counter++;
       if (timer_counter % this.interval == 0) {
         if (this.binance_api.working_pair != null) {
-          this.show()
+          if (this.showLiveChart) {
+            this.show();
+          }
         }
         timer_counter = 0;
       }
@@ -45,19 +49,19 @@ export class ChartLiveComponent implements OnInit {
       this.binance_api.get_lastPries()
         .subscribe(data => {
           // console.log(data);
-          if (this.mainChartData[0].data.length > this.max_allowed_points) { 
+          if (this.mainChartData[0].data.length > this.max_allowed_points) {
             var diff = this.mainChartData[0].data.length - this.max_allowed_points
-            for(let i=0; i<diff; i++){this.mainChartData[0].data.shift(); this.mainChartLabels.shift(); this.mainChartData[0].backgroundColor.shift()}
+            for (let i = 0; i < diff; i++) { this.mainChartData[0].data.shift(); this.mainChartLabels.shift(); this.mainChartData[0].backgroundColor.shift() }
           }
           // try {
-          if (this.prev_price==null){this.prev_price=parseFloat(data[this.temp_pair]);}
+          // if (this.prev_price == null) { this.prev_price = parseFloat(data[this.temp_pair]); }
           var date = new Date()
-          let prcent_diff = ((1.0-((parseFloat(data[this.temp_pair])/this.prev_price)))*100);
-          this.mainChartData[0].data.push(prcent_diff.toFixed(2));
+          let prcent_diff = 100 - ((((parseFloat(data[this.temp_pair]) / this.prev_price))) * 100);
+          this.mainChartData[0].data.push(Math.abs(prcent_diff).toFixed(2));
           this.mainChartLabels.push(date.toString().split(" ")[4]);
-          if (prcent_diff>0.000000){
+          if (prcent_diff > 0.000000) {
             this.mainChartData[0].backgroundColor.push("rgba(50, 200, 120, 0.2)");
-          }else{
+          } else {
             this.mainChartData[0].backgroundColor.push("rgba(200, 50, 50, 0.2)");
           }
           this.prev_price = parseFloat(data[this.temp_pair]);
