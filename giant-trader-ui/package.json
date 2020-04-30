@@ -22,7 +22,7 @@
     "bootstrap": "^4.4.1",
     "chart.js": "^2.9.3",
     "chartjs": "^0.3.24",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "ng2-charts": "^2.3.0",
     "popper.js": "^1.16.0",
     "rxjs": "~6.4.0",
