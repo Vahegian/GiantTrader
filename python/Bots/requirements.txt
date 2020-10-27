@@ -9,7 +9,7 @@ cffi==1.13.2
 chardet==3.0.4
 Click==7.0
 constantly==15.1.0
-cryptography==2.8
+cryptography==3.2
 dateparser==0.7.2
 Flask==1.1.1
 Flask-Cors==3.0.8
