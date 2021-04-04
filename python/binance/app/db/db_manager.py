@@ -1,7 +1,8 @@
-from db.psql_connector import PSQLConnector
+# from db.psql_connector import PSQLConnector
 from db.sql_lite_connector import SQLLConnector
 from contextlib import contextmanager
 
+DB_FILE = "./db.db"
 class DBManager:
     def __init__(self, db_name=None, user=None, password=None, host=None, port='5432', db_file=None):
         self.__db_name = db_name
@@ -14,13 +15,11 @@ class DBManager:
     @contextmanager
     def db_cur(self):
         try:
+            self.__connector = SQLLConnector()
             if self.__db_file != None:
-                self.__connector = SQLLConnector()
                 self.__connector.connect(self.__db_file)
             else:
-                self.__connector = PSQLConnector()
-                self.__connector.connect(self.__db_name, self.__user, self.__pass,
-                                    self.__host, self.__port)
+                self.__connector.connect(DB_FILE)
         
             yield self.__connector
         except Exception as e:

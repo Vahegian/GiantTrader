@@ -9,8 +9,12 @@ class TradeExec:
         self.__aw = activityWatcher
 
         connected = self.__trader.connect_to_account(apiKey, apiSecret)
+        # print(connected)
         if not connected:
             raise ValueError(self.TAG, "ApiKey or Secret is Not Valid")
+
+        if apiKey == self.__trader.default_Key and apiSecret == self.__trader.default_Secret:
+            return
         self.__trader.update_request_limits()
         self.fees = self.__trader.get_fees()
         
@@ -20,7 +24,7 @@ class TradeExec:
         self.__prices = {}
         self.start_price_tickers()
         self.__init_time = datetime.datetime.now()
-        # self.__trader.market_buy("XRPUSDT", 10)
+        # self.__trader.market_buy("BTCUSDT", 10)
         # exit(0)
 
 
@@ -56,7 +60,7 @@ class TradeExec:
         """
             method resets BinanceSocket, which streames asset prices
             every given period.
-            It also stores 'close' prices to dictionary with following 
+            It also stores 'close' prices to a dictionary with following 
             syntax {"symbol":"price"} 
         """
         cur_time = datetime.datetime.now()

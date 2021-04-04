@@ -111,13 +111,14 @@ class AddUser(Resource):
             return {"message":"add user name, password, apiKey and apiSecret"}, 400
         else:
             master.add_user(uname,upass,apikey, apiSecret)
-            return {"message":f"user {uname} added"}, 201
+            return {"message":f"user {uname} added", "status": 1}, 201
 
 class GetLprices(Resource):
     @wrap_with_try
     def post(self):
         args = parser.parse_args()
         uname = args['uname']
+        # print(uname)
         if not uname:
             return {"message":"add user name "}, 400
         else:
@@ -254,12 +255,14 @@ api.add_resource(CancelOrder, '/ocancel')
 api.add_resource(GetPairFees, '/pairfee')
 api.add_resource(LogOutUser, '/outuser')
 
-
+import os, sys
 if __name__ == "__main__":
-    # with open("./private/private.csv") as pfile:
-    #     data = (pfile.readline()).split(",")
-    # master = Master(data[0], data[1])
+    dbPath = "./private/db.db"
+    if not os.path.exists(dbPath):
+        os.mkdir("./private")
+        os.mknod(dbPath)   
 
-    master = Master(dbFile="./private/db.db")
+
+    master = Master(dbFile=dbPath)
 
     app.run(debug=True, port=5000, host='0.0.0.0')

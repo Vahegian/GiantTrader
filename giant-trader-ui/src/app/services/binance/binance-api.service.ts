@@ -32,7 +32,8 @@ export class BinanceApiService {
     u_buy_market_url : "/mbuy",
     u_get_pair_fee_url : "/pairfee",
     u_get_ohlc_url : "/ohlcv",
-    u_strategies_url : "/strategies"
+    u_strategies_url : "/strategies",
+    u_add_user_url: "/au/new"
   }
   
   constructor(private http: HttpClient) {
@@ -40,10 +41,12 @@ export class BinanceApiService {
   }
 
   login_user(uname, pass): Observable<Login_resp>{
+    this.logged_in_user = uname
     return this.http.post<Login_resp>(this.urls.server+this.urls.u_login_url, JSON.stringify({"uname":uname, "upass":pass}), this.httpOptions);
   }
 
   logout_user(uname): Observable<Login_resp>{
+    this.logged_in_user = ""
     return this.http.post<Login_resp>(this.urls.server+this.urls.u_logout_url, 
             JSON.stringify({"uname":uname}), this.httpOptions);
   }
@@ -53,6 +56,7 @@ export class BinanceApiService {
   }
 
   get_lastPries(): Observable<any> {
+    console.log(this.logged_in_user)
     return this.http.post<any>(this.urls.server+this.urls.u_get_last_prices_url, JSON.stringify({"uname":this.logged_in_user}), this.httpOptions);
   }
 
@@ -126,6 +130,14 @@ export class BinanceApiService {
       JSON.stringify({"uname":this.logged_in_user,
                       "pair":pair,
                       "days":days,}), this.httpOptions);
+  }
+
+  create_user(name, pass, key, secret): Observable<any>{
+    return this.http.post<any>(this.urls.server+this.urls.u_add_user_url, 
+      JSON.stringify({"uname":name,
+                      "upass":pass,
+                      "apiKey":key,
+                      "apiSecret": secret}), this.httpOptions);
   }
 
 }

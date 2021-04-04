@@ -3,6 +3,7 @@ services:
   ang:
     build: ./gian_trade_angular/
     container_name: docker_ang_1 
+    #user: 1000:1000
     restart: always
     volumes:
       - ../giant-trader-ui:/usr/src/app
@@ -13,36 +14,65 @@ services:
       - "10003:4200"
     depends_on:
       - binance
+#   remove after development
+    command: /bin/sh
+    stdin_open: true
+    tty: true
+#   \remove after developmet
 
   ai:
     build: ./gian_trade_ai/
     container_name: docker_ai_1 
+    #user: 1000:1000
     restart: always
     volumes:
       - ../python/AI:/usr/src/app
     networks:
       all:
         ipv4_address: 172.20.0.4
+    # ports:
+    #   - "100002:5000"
+#   remove after development
+    command: /bin/sh
+    stdin_open: true
+    tty: true
+#   \remove after developmet
 
   binance:
     build: ./gian_trade_binance/
     container_name: docker_binance_1
+    #user: 1000:1000 # prevents files from being root
     restart: always
     volumes:
       - ../python/binance/app:/usr/src/app
     networks:
       all:
         ipv4_address: 172.20.0.3
+    # ports:
+    #   - "100001:5000"
+#   remove after development
+    command: /bin/sh
+    stdin_open: true
+    tty: true
+#   \remove after developmet
   
   bots:
     image: docker_binance:latest
     container_name: docker_bots_1
+    #user: 1000:1000 # prevents files from being root
     restart: always
     volumes:
       - ../python/Bots:/usr/src/app
     networks:
       all:
         ipv4_address: 172.20.0.6
+    # ports:
+    #   - "100004:5000"
+  #   remove after development
+    command: /bin/sh
+    stdin_open: true
+    tty: true
+  #   \remove after developmet
     depends_on:
       - binance
 

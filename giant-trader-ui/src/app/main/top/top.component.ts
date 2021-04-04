@@ -12,7 +12,7 @@ export class TopComponent implements OnInit {
   public show_loading = true;
   public pairs = [];
   public in_user = "";
-  private pair_prices_to_show = [["BTCUSDT",0.0, ""], ["BCHUSDT",0.0,""], ["ETHUSDT",0.0, ""], ["XRPUSDT",0.0,""], ["LTCUSDT",0.0,""], ["EOSUSDT",0.0,""],["BATUSDT",0.0,""]]
+  private pair_prices_to_show = [["BTCUSDT",0.0, ""], ["ETHUSDT",0.0, ""], ["ADAUSDT",0.0,""], ["DOTUSDT",0.0,""], ["LTCUSDT",0.0,""], ["THETAUSDT",0.0,""],["LINKUSDT",0.0,""]]
   public live_users = []
   constructor(public engine_api: BinanceApiService, private router: Router) {
     this.in_user = engine_api.logged_in_user;

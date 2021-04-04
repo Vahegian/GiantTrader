@@ -18,6 +18,28 @@
                     </button>
                 </div>
             </div>
+
+            <div class="card my-5">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Register</h5>
+                    <input #reg_uname type="text" class="form-control" placeholder="Username" required autofocus>
+                    <br>
+                    <input #reg_pass type="password" class="form-control" placeholder="Password" required>
+                    <br>
+                    <input #reg_key type="password" class="form-control" placeholder="binance api key" required>
+                    <br>
+                    <input #reg_secret type="password" class="form-control" placeholder="binance api secret" required>
+                    <hr class="my-4">
+                    <button (click)="reg_user(reg_uname.value, reg_pass.value, reg_key.value, reg_secret.value)"
+                        class="btn btn-lg btn-primary">Register
+                        <div *ngIf="show_loggingin">
+                            <div class="spinner-grow text-info" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

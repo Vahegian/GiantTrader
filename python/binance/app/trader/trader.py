@@ -201,17 +201,17 @@ if __name__ == "__main__":
     oOrder = bc.get_open_orders()
     print("\n", oOrder)
     # Cancel an active order
-    # print("\n", bc.cancel_order('XRPUSDC', oOrder['XRPUSDC']['orderId']))
+    # print("\n", bc.cancel_order('BTCUSDC', oOrder['BTCUSDC']['orderId']))
 
     #put sell limit order
-    # print(bc.put_limit_order_sell("XRPUSDT", 31.6, 0.48))
+    # print(bc.put_limit_order_sell("BTCUSDT", 31.6, 0.48))
     
     # # get live update from web socket
     # p = lambda msg: print(msg[0]['s'], msg[0]['p'])
     # bc.get_live_ticker_update(p)
 
     #get historical OHLCV data
-    print("\n", bc.get_hist_data_day_interval("XRPUSDT", 3))
+    print("\n", bc.get_hist_data_day_interval("BTCUSDT", 3))
 
     
     

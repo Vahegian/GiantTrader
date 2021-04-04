@@ -12,12 +12,12 @@ WORKDIR ${ENTRY_PATH}
 EXPOSE 4200/tcp
 
 # Software b1
-RUN npm install -g @angular/cli && \ 
+RUN npm install -g @angular/cli && \
     rm -rf /var/lib/apt/lists/*
 # \Software b1
 
 # Running script
 #RUN cd ${ENTRY_PATH}
-CMD ng serve --host 0.0.0.0
+CMD echo Please wait, installing libs ..... && npm i && ng serve --host 0.0.0.0
 # \Running script
 

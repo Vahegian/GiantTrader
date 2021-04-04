@@ -13,7 +13,7 @@ class Master:
         if dbFile != None:
             self.__db = DBManager(db_file=dbFile)
         else:
-            self.__db = DBManager(self.__db_name, dbuname, dbpass, self.__host, self.__port)
+            self.__db = DBManager()
         self.__uManager = UserManager(self.__db)
         self.__actWatch= ActivityWatch(self.__db) 
 
