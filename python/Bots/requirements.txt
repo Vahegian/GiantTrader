@@ -1,7 +1,7 @@
 aniso8601==8.0.0
 astroid==2.3.3
 attrs==19.3.0
-autobahn==19.11.1
+autobahn==20.12.3
 Automat==0.8.0
 autopep8==1.4.4
 certifi==2019.11.28
