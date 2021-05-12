@@ -9,7 +9,7 @@
   "author": "Vahegian",
   "license": "ISC",
   "dependencies": {
-    "chart.js": "^2.9.2",
+    "chart.js": "^2.9.4",
     "electron": "^7.0.1",
     "express": "^4.17.1"
   }
